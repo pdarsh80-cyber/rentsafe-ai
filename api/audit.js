@@ -1,750 +1,95 @@
-<style>
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8fafc;color:#1f2937;line-height:1.6;overflow-x:hidden}
+const fetch = (...args) => import('node-fetch').then(({default: f}) => f(...args));
 
-/* ── Hero ── */
-.hero{background:linear-gradient(135deg,#0f1a2e,#1a3050);color:#fff;padding:40px 16px 72px;text-align:center}
-.logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}
-.logo-icon{width:38px;height:38px;background:#f59e0b;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
-.logo-text{font-size:20px;font-weight:800}.logo-text span{color:#f59e0b}
-/* NEW: tagline under logo */
-.logo-tagline{font-size:11px;font-weight:600;color:#94a3b8;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:22px}
-.hero h1{font-size:clamp(20px,5.5vw,40px);font-weight:800;line-height:1.25;margin-bottom:12px}
-.hero h1 span{color:#f59e0b}
-.hero p{font-size:14px;color:#94a3b8;max-width:500px;margin:0 auto 22px}
-.badges{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
-.badge{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#e2e8f0;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600}
-.badge.am{background:rgba(245,158,11,.18);border-color:rgba(245,158,11,.4);color:#fcd34d}
-
-/* ── Layout ── */
-.wrap{max-width:740px;margin:0 auto;padding:0 14px}
-.icard{background:#fff;border-radius:16px;box-shadow:0 4px 28px rgba(0,0,0,.1);margin-top:-42px;position:relative;z-index:10;overflow:hidden}
-.tabs{display:flex;border-bottom:1px solid #e5e7eb}
-.tab{flex:1;padding:14px 8px;border:none;background:none;font-size:13px;font-weight:600;cursor:pointer;color:#6b7280;min-height:48px;touch-action:manipulation}
-.tab.on{color:#0f1a2e;border-bottom:2.5px solid #f59e0b;margin-bottom:-1px}
-.ibody{padding:18px}
-.pnl{display:none}.pnl.on{display:block}
-textarea{width:100%;min-height:160px;border:2px solid #e5e7eb;border-radius:10px;padding:12px;font-size:14px;font-family:inherit;background:#f9fafb;resize:vertical}
-textarea:focus{outline:none;border-color:#f59e0b;background:#fff}
-textarea::placeholder{color:#9ca3af}
-
-/* NEW: Trust signal */
-.trust-sig{display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2);border-radius:8px;padding:7px 12px;margin-bottom:13px;font-size:12px;font-weight:600;color:#166534}
-
-/* ── File upload ── */
-.dz{border:2px dashed #d1d5db;border-radius:10px;padding:36px 16px;text-align:center;background:#f9fafb;position:relative;overflow:hidden;cursor:pointer}
-.dz-inner{pointer-events:none}
-.dz-inner h3{font-size:14px;font-weight:600;color:#1f2937;margin:8px 0 4px}
-.dz-inner p{font-size:12px;color:#6b7280}
-.fi{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer}
-.fsel{display:none;align-items:center;gap:10px;padding:12px 14px;background:#fffbeb;border:2px solid #f59e0b;border-radius:10px;margin-top:12px}
-.fname{font-size:13px;font-weight:500;flex:1;min-width:0;word-break:break-all}
-.frm{background:none;border:none;color:#6b7280;cursor:pointer;font-size:18px;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center}
-
-/* ── Audit counter badge ── */
-.audit-counter{display:flex;align-items:center;justify-content:space-between;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 13px;margin-bottom:12px;font-size:12.5px;font-weight:600;color:#166534}
-.audit-counter span{font-size:11px;color:#6b7280;font-weight:500}
-
-.abtn{width:100%;padding:15px;background:#f59e0b;color:#0f1a2e;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-top:14px;min-height:52px;touch-action:manipulation}
-.abtn:active{background:#d97706}
-.errdiv{background:#fee2e2;border:1px solid #fecaca;border-radius:10px;padding:12px 16px;color:#991b1b;font-size:13px;margin-top:10px;display:none}
-.errdiv.on{display:block}
-
-/* ── Loader ── */
-.ldr{display:none;text-align:center;padding:48px 20px}
-.ldr.on{display:block}
-.spin{width:44px;height:44px;border:4px solid #e5e7eb;border-top-color:#f59e0b;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.ldr h3{font-size:16px;font-weight:600;margin-bottom:6px}
-.ldr p{font-size:13px;color:#6b7280}
-
-/* ── Modals (shared base) ── */
-.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:flex-end;justify-content:center}
-.overlay.on{display:flex}
-.mbox{background:#fff;border-radius:20px 20px 0 0;padding:20px 18px 32px;width:100%;max-height:90vh;overflow-y:auto}
-.mhandle{width:40px;height:4px;background:#e5e7eb;border-radius:2px;margin:0 auto 18px}
-.mbox h3{font-size:18px;font-weight:800;color:#0f1a2e;margin-bottom:6px}
-.mbox .msub{font-size:13px;color:#6b7280;margin-bottom:12px;line-height:1.65}
-.mtrust{display:flex;gap:8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:9px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:#166534;font-weight:500;line-height:1.5}
-select{width:100%;padding:12px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:16px;font-family:inherit;background:#f9fafb;margin-bottom:13px;min-height:48px;-webkit-appearance:none;appearance:none}
-select:focus{outline:none;border-color:#f59e0b}
-.mcbtn{width:100%;padding:14px;background:#f59e0b;color:#0f1a2e;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;min-height:52px;touch-action:manipulation}
-.mcbtn:disabled{opacity:.5;cursor:not-allowed}
-
-/* ── NEW: Paywall Modal ── */
-#paywallModal .mbox{background:linear-gradient(160deg,#0f1a2e,#1a3050);color:#fff;border-radius:20px 20px 0 0}
-#paywallModal .mhandle{background:rgba(255,255,255,.2)}
-#paywallModal h3{color:#fff;font-size:20px}
-#paywallModal .msub{color:#94a3b8}
-.pw-plans{display:flex;flex-direction:column;gap:11px;margin:16px 0}
-.pw-plan{border-radius:13px;padding:16px;cursor:pointer;border:2px solid transparent;transition:border-color .2s}
-.pw-plan.pay{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.15)}
-.pw-plan.sub{background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(245,158,11,.08));border-color:#f59e0b}
-.pw-plan-badge{font-size:10px;font-weight:700;background:#f59e0b;color:#0f1a2e;border-radius:4px;padding:2px 7px;margin-bottom:6px;display:inline-block}
-.pw-plan h4{font-size:17px;font-weight:800;color:#fff;margin-bottom:3px}
-.pw-plan p{font-size:12px;color:#94a3b8;line-height:1.5}
-.pw-plan .pw-price{font-size:26px;font-weight:800;color:#f59e0b;margin:4px 0}
-.pw-plan .pw-price span{font-size:13px;color:#94a3b8;font-weight:500}
-.pw-btn{width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;min-height:52px;margin-bottom:8px;touch-action:manipulation}
-.pw-btn.pay{background:#fff;color:#0f1a2e}
-.pw-btn.sub{background:#f59e0b;color:#0f1a2e}
-.pw-dismiss{background:none;border:none;color:#64748b;font-size:12px;cursor:pointer;width:100%;padding:6px;text-align:center}
-
-/* ── Results ── */
-.res{display:none;margin-top:18px}.res.on{display:block}
-.stbar{background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:9px 13px;font-size:12.5px;color:#3730a3;font-weight:600;margin-bottom:13px}
-.rhead{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:13px}
-.rhead h2{font-size:19px;font-weight:800;color:#0f1a2e}
-.rb{padding:4px 12px;border-radius:18px;font-size:11px;font-weight:700;text-transform:uppercase;white-space:nowrap;display:inline-block}
-.rh{background:#fee2e2;color:#991b1b}.rm{background:#fef3c7;color:#92400e}.rl{background:#dcfce7;color:#166534}
-.sccard{background:linear-gradient(135deg,#0f1a2e,#1e3a5f);border-radius:14px;padding:20px;margin-bottom:14px;display:flex;flex-direction:column;gap:13px}
-.scnum{font-size:44px;font-weight:800;color:#fff;line-height:1}
-.scnum span{font-size:18px;color:#94a3b8}
-.scconf{font-size:11px;color:#fcd34d;font-weight:600;margin-top:3px}
-.scbg{background:rgba(255,255,255,.12);border-radius:7px;height:10px;overflow:hidden;margin-bottom:7px}
-.scfill{height:100%;border-radius:7px;transition:width 1s ease}
-.sclbl{font-size:12px;color:#94a3b8;font-weight:600}
-.scpills{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
-.sumcard{background:#fff;border-radius:12px;padding:16px;margin-bottom:13px;border-left:4px solid #0f1a2e;box-shadow:0 2px 8px rgba(0,0,0,.05);word-wrap:break-word}
-.sumcard h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#6b7280;margin-bottom:5px}
-.sumcard p{font-size:14px;color:#1f2937;line-height:1.7}
-.ftitle{font-size:14px;font-weight:700;color:#0f1a2e;margin-bottom:9px;margin-top:3px}
-.fc{background:#fff;border-radius:12px;padding:15px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05);border-left:4px solid transparent;word-wrap:break-word}
-.fc.h{border-left-color:#ef4444}.fc.m{border-left-color:#f59e0b}.fc.l{border-left-color:#22c55e}
-.fhd{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:7px;flex-wrap:wrap}
-.ftit{font-size:14px;font-weight:700;color:#0f1a2e;flex:1;min-width:0}
-.fbdg{display:flex;align-items:center;gap:5px;flex-wrap:wrap;flex-shrink:0}
-.cconf{font-size:11px;font-weight:600;color:#6b7280;white-space:nowrap}
-.fexp{font-size:13.5px;color:#374151;line-height:1.65;margin-bottom:8px}
-.cref{background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;padding:7px 10px;font-size:12px;color:#475569;margin-bottom:7px;font-style:italic;word-wrap:break-word}
-.imp{background:#fffbeb;border:1px solid #fde68a;border-radius:7px;padding:7px 10px;font-size:12.5px;color:#92400e;font-weight:500;margin-bottom:9px}
-.uflag{background:#fff7ed;border:1px solid #fed7aa;border-radius:7px;padding:7px 10px;font-size:12.5px;color:#c2410c;font-weight:500;margin-bottom:9px}
-.tags{display:flex;flex-wrap:wrap;gap:5px}
-.ctag{background:#eef2ff;border:1px solid #c7d2fe;color:#3730a3;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:600}
-.ptag{background:#f9fafb;border:1px solid #e5e7eb;color:#6b7280;padding:3px 9px;border-radius:6px;font-size:11px}
-.accard{background:#fff;border-radius:12px;padding:16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05);border-left:4px solid #6366f1}
-.accard h3{font-size:14px;font-weight:700;color:#0f1a2e;margin-bottom:11px}
-.ai{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid #f3f4f6;font-size:13.5px;color:#374151;line-height:1.5}
-.ai:last-child{border-bottom:none;padding-bottom:0}
-.anum{width:21px;height:21px;background:#6366f1;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:2px}
-.chkcard{background:#fff;border-radius:12px;padding:16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-.chkcard h3{font-size:14px;font-weight:700;margin-bottom:9px}
-.chki{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid #f3f4f6;font-size:13.5px;color:#374151;word-wrap:break-word}
-.chki:last-child{border-bottom:none;padding-bottom:0}
-.shcard{background:#fff;border-radius:12px;padding:16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-.shcard h3{font-size:14px;font-weight:700;margin-bottom:11px;color:#0f1a2e}
-.shprev{background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:10px 12px;font-size:12.5px;color:#374151;margin-bottom:11px;line-height:1.6;font-style:italic;word-wrap:break-word}
-.shbtns{display:flex;flex-direction:column;gap:9px}
-.sb{width:100%;padding:12px 14px;border-radius:9px;border:none;font-size:14px;font-weight:600;cursor:pointer;min-height:48px;display:flex;align-items:center;justify-content:center;gap:7px;touch-action:manipulation}
-.sbcp{background:#f3f4f6;color:#1f2937;border:1.5px solid #e5e7eb}
-.sbwa{background:#25d366;color:#fff}
-.sbdl{background:#0f1a2e;color:#fff}
-.toast{font-size:11px;font-weight:600;background:#166534;color:#fff;border-radius:5px;padding:2px 8px;opacity:0;transition:opacity .3s;margin-left:6px}
-.toast.on{opacity:1}
-.nabtn{width:100%;padding:13px;background:#fff;color:#0f1a2e;border:2px solid #0f1a2e;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px;margin-bottom:16px;min-height:52px;touch-action:manipulation}
-.nabtn:active{background:#0f1a2e;color:#fff}
-
-/* ── NEW: Rating card ── */
-.ratingcard{background:#fff;border-radius:12px;padding:18px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05);border-left:4px solid #f59e0b;text-align:center}
-.ratingcard h3{font-size:15px;font-weight:700;color:#0f1a2e;margin-bottom:4px}
-.ratingcard p{font-size:12.5px;color:#6b7280;margin-bottom:13px}
-.stars{display:flex;justify-content:center;gap:8px;margin-bottom:13px}
-.star{font-size:30px;cursor:pointer;opacity:.3;transition:opacity .15s,transform .15s;touch-action:manipulation}
-.star.on{opacity:1;transform:scale(1.15)}
-.rating-txt{width:100%;border:2px solid #e5e7eb;border-radius:9px;padding:10px 12px;font-size:13px;font-family:inherit;background:#f9fafb;resize:none;min-height:72px;margin-bottom:11px}
-.rating-txt:focus{outline:none;border-color:#f59e0b}
-.rating-submit{width:100%;padding:12px;background:#f59e0b;color:#0f1a2e;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;min-height:46px;touch-action:manipulation}
-.rating-thanks{font-size:14px;font-weight:600;color:#166534;padding:10px 0;display:none}
-
-/* ── How It Works ── */
-.hiw{padding:48px 16px;text-align:center}
-.hiw .lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#f59e0b;margin-bottom:6px}
-.hiw h2{font-size:clamp(20px,5vw,26px);font-weight:800;color:#0f1a2e;margin-bottom:30px}
-.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:20px;max-width:700px;margin:0 auto}
-.sn{width:44px;height:44px;background:linear-gradient(135deg,#0f1a2e,#1e3a5f);color:#f59e0b;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;margin:0 auto 11px}
-.step h3{font-size:14px;font-weight:700;color:#0f1a2e;margin-bottom:4px}
-.step p{font-size:12.5px;color:#6b7280;line-height:1.6}
-
-/* ── Footer ── */
-footer{background:#0f1a2e;color:#94a3b8;padding:28px 16px;text-align:center}
-.ftlogo{font-size:16px;font-weight:800;display:block;margin-bottom:4px}
-.ftlogo span{color:#f59e0b}
-.ft-tagline{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#475569;margin-bottom:10px;display:block}
-footer p{font-size:11.5px;line-height:1.7;max-width:520px;margin:0 auto 5px;word-wrap:break-word}
-.disc{border-top:1px solid rgba(255,255,255,.1);padding-top:13px;margin-top:13px}
-
-@media(min-width:580px){
-  .shbtns{flex-direction:row;flex-wrap:wrap}
-  .sb{flex:1;min-width:110px;width:auto}
-  .overlay{align-items:center;padding:20px}
-  .mbox{border-radius:16px;max-width:420px}
-  .mhandle{display:none}
-  .sccard{flex-direction:row;align-items:center}
-  .pw-plans{flex-direction:row}
-  .pw-plan{flex:1}
-}
-</style>
-
-<!-- ══════════════════════════════════════════
-     STATE MODAL
-══════════════════════════════════════════ -->
-<div class="overlay" id="modal">
-  <div class="mbox">
-    <div class="mhandle"></div>
-    <h3>📍 Select Your State</h3>
-    <p class="msub">Rental laws vary across India. Your state helps us apply local rules.</p>
-    <div class="mtrust">✅ We apply state-specific rental rules to ensure your agreement avoids local legal risks — not just central law.</div>
-    <select id="stsel">
-      <option value="">-- Select your state --</option>
-      <option>Andhra Pradesh</option><option>Assam</option><option>Bihar</option>
-      <option>Chandigarh</option><option>Chhattisgarh</option><option>Delhi</option>
-      <option>Goa</option><option>Gujarat</option><option>Haryana</option>
-      <option>Himachal Pradesh</option><option>Jammu &amp; Kashmir</option><option>Jharkhand</option>
-      <option>Karnataka</option><option>Kerala</option><option>Madhya Pradesh</option>
-      <option>Maharashtra</option><option>Odisha</option><option>Punjab</option>
-      <option>Rajasthan</option><option>Tamil Nadu</option><option>Telangana</option>
-      <option>Uttar Pradesh</option><option>Uttarakhand</option><option>West Bengal</option>
-    </select>
-    <button class="mcbtn" id="mcbtn" disabled>Continue to Audit →</button>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════
-     NEW: PAYWALL MODAL
-══════════════════════════════════════════ -->
-<div class="overlay" id="paywallModal">
-  <div class="mbox">
-    <div class="mhandle"></div>
-    <h3>🔒 Free Audits Used Up</h3>
-    <p class="msub">You've used your 2 free audits. Choose a plan to continue protecting yourself.</p>
-    <div class="pw-plans">
-      <div class="pw-plan pay">
-        <div class="pw-plan-badge">PAY PER USE</div>
-        <div class="pw-price">₹99 <span>/ audit</span></div>
-        <h4>Single Audit</h4>
-        <p>One-time payment. Full audit with legal citations and report download.</p>
-      </div>
-      <div class="pw-plan sub">
-        <div class="pw-plan-badge">BEST VALUE ⭐</div>
-        <div class="pw-price">₹199 <span>/ month</span></div>
-        <h4>Unlimited Audits</h4>
-        <p>Unlimited audits, priority support, and all future features included.</p>
-      </div>
-    </div>
-    <button class="pw-btn pay" onclick="handlePayment('single')">Continue with ₹99 per audit</button>
-    <button class="pw-btn sub" onclick="handlePayment('monthly')">Upgrade to ₹199/month Unlimited</button>
-    <button class="pw-dismiss" onclick="document.getElementById('paywallModal').classList.remove('on')">Maybe later</button>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════
-     HERO
-══════════════════════════════════════════ -->
-<div class="hero">
-  <div class="logo">
-    <div class="logo-icon">🛡️</div>
-    <div class="logo-text">Rent<span>Safe</span> AI</div>
-  </div>
-  <!-- UPDATED: tagline -->
-  <div class="logo-tagline">Clarity. Compliance. Confidence.</div>
-  <!-- UPDATED: headline -->
-  <h1>Unlock Instant Legal Clarity<br><span>for Your Rental Agreement.</span><br>Protect Your Future.</h1>
-  <p>Instant AI audit of your rental agreement — every issue cited to the exact Indian law it violates.</p>
-  <div class="badges">
-    <span class="badge am">✓ 2 Free Audits</span>
-    <span class="badge">⚡ 30 seconds</span>
-    <span class="badge">📜 2026 Rent Rules</span>
-    <span class="badge">🇮🇳 India</span>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════
-     MAIN CARD
-══════════════════════════════════════════ -->
-<div class="wrap">
-  <div class="icard" id="maincard">
-    <div class="tabs">
-      <button class="tab on" id="t1">📋 Paste Text</button>
-      <button class="tab" id="t2">📄 Upload PDF</button>
-    </div>
-    <div class="ibody" id="ibody">
-
-      <!-- NEW: Trust signal -->
-      <div class="trust-sig">🔒 End-to-end encrypted. Your documents are private and never stored.</div>
-
-      <!-- NEW: Audit counter -->
-      <div class="audit-counter" id="auditCounter">
-        <span id="auditCounterText">✅ 2 free audits remaining</span>
-        <span id="auditCounterSub"></span>
-      </div>
-
-      <div class="pnl on" id="pp">
-        <textarea id="txt" placeholder="Paste your rental agreement here…"></textarea>
-      </div>
-      <div class="pnl" id="pu">
-        <div class="dz" id="dz">
-          <div class="dz-inner">
-            <div style="font-size:32px">📁</div>
-            <h3>Tap to upload PDF</h3>
-            <p>PDF only, max 10MB</p>
-          </div>
-          <input class="fi" type="file" id="fi" accept=".pdf">
-        </div>
-        <div class="fsel" id="fsel">
-          <span style="font-size:20px;flex-shrink:0">📄</span>
-          <span class="fname" id="fn"></span>
-          <button class="frm" id="frmbtn">✕</button>
-        </div>
-      </div>
-      <button class="abtn" id="auditbtn">🔍 Audit My Agreement</button>
-      <div class="errdiv" id="errdiv"></div>
-    </div>
-    <div class="ldr" id="ldr">
-      <div class="spin"></div>
-      <h3>Analysing your agreement…</h3>
-      <p>Checking against Indian rental law &amp; 2026 New Rent Rules</p>
-    </div>
-  </div>
-  <div class="res" id="res"></div>
-</div>
-
-<!-- ══════════════════════════════════════════
-     HOW IT WORKS
-══════════════════════════════════════════ -->
-<div class="hiw">
-  <p class="lbl">How It Works</p>
-  <h2>Clarity in three steps</h2>
-  <div class="steps">
-    <div class="step"><div class="sn">1</div><h3>Paste or upload</h3><p>Share your agreement text or PDF directly.</p></div>
-    <div class="step"><div class="sn">2</div><h3>AI audits it</h3><p>Checked against Indian law and 2026 New Rent Rules.</p></div>
-    <div class="step"><div class="sn">3</div><h3>Get findings</h3><p>Plain English issues with exact legal citations.</p></div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════
-     FOOTER — UPDATED copy & tagline
-══════════════════════════════════════════ -->
-<footer>
-  <span class="ftlogo">Rent<span>Safe</span> AI</span>
-  <span class="ft-tagline">Clarity. Compliance. Confidence.</span>
-  <!-- UPDATED: social bio -->
-  <p>Instant AI legal auditor for India's rental market. Get 100% compliant agreements, secure your deposits, and avoid fines. Rent smart.</p>
-  <div class="disc">
-    <p>⚖️ For informational purposes only. Not a substitute for legal advice. Consult a qualified advocate before signing.</p>
-    <p style="margin-top:8px;font-size:10px;opacity:.5">© 2026 RentSafe AI · Vadodara, Gujarat</p>
-  </div>
-</footer>
-
-<script>
-// ══════════════════════════════════════════
-// STATE
-// ══════════════════════════════════════════
-var curTab = 'paste', pdfB64 = null, selState = '', lastData = null;
-var FREE_LIMIT = 2;
-
-// ── Monetization helpers (localStorage) ──
-function getUsage() {
-  try { return JSON.parse(localStorage.getItem('rentsafe_usage') || '{"count":0,"plan":"free"}'); }
-  catch(e) { return { count: 0, plan: 'free' }; }
-}
-function setUsage(u) { localStorage.setItem('rentsafe_usage', JSON.stringify(u)); }
-function canAudit() {
-  var u = getUsage();
-  return u.plan === 'paid' || u.count < FREE_LIMIT;
-}
-function incrementUsage() {
-  var u = getUsage();
-  if (u.plan !== 'paid') { u.count++; setUsage(u); }
-}
-function updateCounter() {
-  var u = getUsage();
-  var el = document.getElementById('auditCounterText');
-  var sub = document.getElementById('auditCounterSub');
-  if (u.plan === 'paid') {
-    el.textContent = '⭐ Unlimited plan active';
-    el.style.color = '#b45309';
-    sub.textContent = '';
-  } else {
-    var rem = Math.max(0, FREE_LIMIT - u.count);
-    el.textContent = rem > 0 ? '✅ ' + rem + ' free audit' + (rem !== 1 ? 's' : '') + ' remaining' : '🔒 Free audits used — upgrade to continue';
-    el.style.color = rem > 0 ? '#166534' : '#991b1b';
-    sub.textContent = rem > 0 ? 'No credit card needed' : '';
+module.exports = async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: { message: 'Method not allowed' } });
   }
-}
 
-// Payment handler — replace with real payment gateway (Razorpay etc.)
-function handlePayment(type) {
-  // TODO: Integrate Razorpay / Cashfree here
-  alert('💳 Payment integration coming soon!\n\nFor now, we\'ll unlock 1 extra audit for demo purposes.');
-  var u = getUsage();
-  u.count = Math.max(0, u.count - 1); // demo: give 1 back
-  setUsage(u);
-  document.getElementById('paywallModal').classList.remove('on');
-  updateCounter();
-}
+  const { text, pdf, state } = req.body;
 
-// ══════════════════════════════════════════
-// ELEMENT REFS
-// ══════════════════════════════════════════
-var modal  = document.getElementById('modal');
-var stsel  = document.getElementById('stsel');
-var mcbtn  = document.getElementById('mcbtn');
-var ibody  = document.getElementById('ibody');
-var ldr    = document.getElementById('ldr');
-var res    = document.getElementById('res');
-var fi     = document.getElementById('fi');
-var dz     = document.getElementById('dz');
-var fsel   = document.getElementById('fsel');
-var errdiv = document.getElementById('errdiv');
-
-updateCounter();
-
-// ══════════════════════════════════════════
-// STATE MODAL
-// ══════════════════════════════════════════
-stsel.addEventListener('change', function() { mcbtn.disabled = !stsel.value; });
-mcbtn.addEventListener('click', function() {
-  selState = stsel.value;
-  if (!selState) return;
-  modal.classList.remove('on');
-  runAudit();
-});
-modal.addEventListener('click', function(e) { if (e.target === modal) modal.classList.remove('on'); });
-
-// ══════════════════════════════════════════
-// TABS
-// ══════════════════════════════════════════
-document.getElementById('t1').addEventListener('click', function() { switchTab('paste'); });
-document.getElementById('t2').addEventListener('click', function() { switchTab('upload'); });
-function switchTab(t) {
-  curTab = t;
-  document.getElementById('t1').classList.toggle('on', t === 'paste');
-  document.getElementById('t2').classList.toggle('on', t === 'upload');
-  document.getElementById('pp').classList.toggle('on', t === 'paste');
-  document.getElementById('pu').classList.toggle('on', t === 'upload');
-}
-
-// ══════════════════════════════════════════
-// FILE UPLOAD
-// ══════════════════════════════════════════
-fi.addEventListener('change', function() {
-  var file = fi.files && fi.files[0];
-  if (!file) return;
-  document.getElementById('fn').textContent = file.name;
-  fsel.style.display = 'flex'; dz.style.display = 'none';
-  var reader = new FileReader();
-  reader.onload = function(ev) { pdfB64 = ev.target.result.split(',')[1]; };
-  reader.readAsDataURL(file);
-});
-dz.addEventListener('dragover', function(e) { e.preventDefault(); dz.style.borderColor='#f59e0b'; dz.style.background='#fffbeb'; });
-dz.addEventListener('dragleave', function() { dz.style.borderColor='#d1d5db'; dz.style.background='#f9fafb'; });
-dz.addEventListener('drop', function(e) {
-  e.preventDefault(); dz.style.borderColor='#d1d5db'; dz.style.background='#f9fafb';
-  var file = e.dataTransfer.files[0];
-  if (file && file.type === 'application/pdf') {
-    document.getElementById('fn').textContent = file.name;
-    fsel.style.display = 'flex'; dz.style.display = 'none';
-    var reader = new FileReader();
-    reader.onload = function(ev) { pdfB64 = ev.target.result.split(',')[1]; };
-    reader.readAsDataURL(file);
+  if (!state) {
+    return res.status(400).json({ error: { message: 'State is required.' } });
   }
-});
-document.getElementById('frmbtn').addEventListener('click', function() {
-  pdfB64 = null; fsel.style.display = 'none'; dz.style.display = 'block'; fi.value = '';
-});
+  if (!text && !pdf) {
+    return res.status(400).json({ error: { message: 'Agreement text or PDF is required.' } });
+  }
 
-// ══════════════════════════════════════════
-// AUDIT BUTTON — checks paywall first
-// ══════════════════════════════════════════
-document.getElementById('auditbtn').addEventListener('click', function() {
-  errdiv.classList.remove('on');
-  var txt = document.getElementById('txt').value.trim();
-  if (curTab === 'paste' && !txt) { showErr('Please paste your agreement text first.'); return; }
-  if (curTab === 'upload' && !pdfB64) { showErr('Please upload a PDF first.'); return; }
-  // Check paywall
-  if (!canAudit()) { document.getElementById('paywallModal').classList.add('on'); return; }
-  modal.classList.add('on');
-});
+  let agreementText = text;
 
-function showErr(msg) { errdiv.textContent = '⚠️ ' + msg; errdiv.classList.add('on'); }
-function setLdr(on) { ibody.style.display = on ? 'none' : 'block'; ldr.classList.toggle('on', on); }
+  if (pdf) {
+    try {
+      const pdfParse = require('pdf-parse');
+      const buffer = Buffer.from(pdf, 'base64');
+      const parsed = await pdfParse(buffer);
+      agreementText = parsed.text;
+      if (!agreementText || agreementText.trim().length < 50) {
+        return res.status(400).json({ error: { message: 'Could not extract text from the PDF. Try copying and pasting the text instead.' } });
+      }
+    } catch (e) {
+      console.error('PDF parse error:', e);
+      return res.status(400).json({ error: { message: 'Failed to read the PDF. Make sure it is not scanned or image-based.' } });
+    }
+  }
 
-// ══════════════════════════════════════════
-// HELPERS
-// ══════════════════════════════════════════
-function calcScore(findings) {
-  var s = 100;
-  for (var i = 0; i < findings.length; i++)
-    s -= findings[i].risk === 'high' ? 20 : findings[i].risk === 'medium' ? 10 : 5;
-  return Math.max(0, s);
-}
-function boostConf(f, c) {
-  var n = c || 75;
-  if (f.citation && f.citation.length > 10) n += 3;
-  if (f.explanation && f.explanation.length > 120) n += 2;
-  if (f.risk === 'high') n += 3;
-  if (f.explanation && f.explanation.length < 60) n -= 8;
-  return Math.min(97, Math.max(55, Math.round(n)));
-}
-function sColor(s) { return s >= 75 ? '#22c55e' : s >= 50 ? '#f59e0b' : '#ef4444'; }
-function sLabel(s) { return s >= 75 ? 'Reasonably Safe' : s >= 50 ? 'Needs Attention' : 'High Risk Agreement'; }
-function esc(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-var RL = { high:'🔴 High Risk', medium:'🟡 Medium Risk', low:'🟢 Low Risk' };
-var RC = { high:'rh', medium:'rm', low:'rl' };
-var RH = { high:'May cause financial or legal loss', medium:'Needs correction before signing', low:'Minor issue, review recommended' };
-var PL = { tenant:'👤 Tenant', landlord:'🏠 Landlord', both:'👥 Both' };
+  const systemPrompt =
+    `You are RentSafe AI, India's expert rental agreement auditor. ` +
+    `Knowledge: Model Tenancy Act 2021, Transfer of Property Act 1882 S105-117, ` +
+    `Registration Act 1908 S17, Indian Stamp Act 1899, ` +
+    `2026 New Rent Rules (digital registration mandatory; informal agreements void), ` +
+    `Indian Contract Act 1872, state norms for ${state}.\n\n` +
+    `Be DIRECT and RISK-FOCUSED. Return ONLY valid JSON, no markdown, no backticks:\n` +
+    `{"summary":"2-3 direct risk-first sentences",` +
+    `"overall_risk":"high|medium|low","overall_confidence":80,` +
+    `"findings":[{"title":"max 8 words","risk":"high|medium|low","confidence":80,` +
+    `"explanation":"2-3 plain sentences","impact":"1 sentence real consequence",` +
+    `"clause_ref":"max 15 word paraphrase of problematic clause",` +
+    `"citation":"Act Year Section","perspective":"tenant|landlord|both"}],` +
+    `"actions":["practical step max 15 words"],` +
+    `"missing_clauses":["clause"],"positive_clauses":["what is correct"]}\n` +
+    `Generate 3-5 actions. ` +
+    `If not a rental agreement return: {"error":"not_agreement","message":"friendly message"}`;
 
-// ══════════════════════════════════════════
-// RUN AUDIT
-// ══════════════════════════════════════════
-async function runAudit() {
-  setLdr(true);
-  res.classList.remove('on');
+  const userPrompt = `Audit this rental agreement for ${state}. Return JSON only.\n\n${agreementText}`;
+
   try {
-    var txt = document.getElementById('txt').value.trim();
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 20000);
-    var response = await fetch('/api/audit', {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ state: selState, text: curTab === 'paste' ? txt : null, pdf: curTab === 'upload' ? pdfB64 : null }),
-      signal: controller.signal
-    });
-    clearTimeout(timeout);
-    var data = await response.json();
-    if (data.error) throw new Error(data.error.message);
-    var raw = data.content.map(function(b) { return b.text || ''; }).join('').replace(/```json|```/g,'').trim();
-    var result = JSON.parse(raw);
-    if (result.error === 'not_agreement') { setLdr(false); showErr(result.message || 'This does not appear to be a rental agreement.'); return; }
-    for (var i = 0; i < result.findings.length; i++)
-      result.findings[i].confidence = boostConf(result.findings[i], result.findings[i].confidence);
-    var score = calcScore(result.findings);
-    lastData = {
-      state: selState, ts: new Date().toISOString(), score: score,
-      or: result.overall_risk, oc: result.overall_confidence || 80,
-      rc: {
-        h: result.findings.filter(function(f){return f.risk==='high';}).length,
-        m: result.findings.filter(function(f){return f.risk==='medium';}).length,
-        l: result.findings.filter(function(f){return f.risk==='low';}).length
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.GROQ_API_KEY}`
       },
-      findings: result.findings, actions: result.actions || [],
-      miss: result.missing_clauses || [], pos: result.positive_clauses || [], sum: result.summary
-    };
-    // Increment usage counter after successful audit
-    incrementUsage();
-    updateCounter();
-    setLdr(false);
-    renderResults(lastData);
-  } catch(e) {
-    setLdr(false);
-    if (e.name === 'AbortError') showErr('⚠️ Taking longer than expected. Please try again.');
-    else showErr('⚠️ Analysis failed. Try again.');
-    console.error(e);
-  }
-}
-
-// ══════════════════════════════════════════
-// RENDER RESULTS
-// ══════════════════════════════════════════
-function renderResults(d) {
-  var col = sColor(d.score);
-  var i, f, c, html = '';
-
-  var fHTML = '';
-  for (i = 0; i < d.findings.length; i++) {
-    f = d.findings[i]; c = f.confidence || 80;
-    fHTML += '<div class="fc ' + f.risk[0] + '">';
-    fHTML += '<div class="fhd"><div class="ftit">' + esc(f.title) + '</div>';
-    fHTML += '<div class="fbdg"><span class="rb ' + RC[f.risk] + '">' + (RL[f.risk]||f.risk) + '</span><span class="cconf">' + c + '%</span></div></div>';
-    fHTML += '<p class="fexp">' + esc(f.explanation) + '</p>';
-    if (f.clause_ref) fHTML += '<div class="cref">📄 ' + esc(f.clause_ref) + '</div>';
-    if (f.impact)     fHTML += '<div class="imp">💡 ' + esc(f.impact) + '</div>';
-    if (c < 75)       fHTML += '<div class="uflag">⚠️ May need further verification by an advocate.</div>';
-    fHTML += '<div class="tags"><span class="ctag">⚖️ ' + esc(f.citation) + '</span><span class="ptag">' + esc(PL[f.perspective]||f.perspective) + '</span></div></div>';
-  }
-
-  var aHTML = '';
-  if (d.actions.length) {
-    aHTML = '<div class="accard"><h3>✅ Recommended Actions</h3>';
-    for (i = 0; i < d.actions.length; i++)
-      aHTML += '<div class="ai"><span class="anum">'+(i+1)+'</span><span>'+esc(d.actions[i])+'</span></div>';
-    aHTML += '</div>';
-  }
-  var mHTML = '';
-  if (d.miss.length) {
-    mHTML = '<div class="chkcard"><h3 style="color:#991b1b">⚠️ Missing Clauses</h3>';
-    for (i = 0; i < d.miss.length; i++) mHTML += '<div class="chki">❌ <span>'+esc(d.miss[i])+'</span></div>';
-    mHTML += '</div>';
-  }
-  var pHTML = '';
-  if (d.pos.length) {
-    pHTML = '<div class="chkcard"><h3 style="color:#166534">✅ Done Right</h3>';
-    for (i = 0; i < d.pos.length; i++) pHTML += '<div class="chki">✅ <span>'+esc(d.pos[i])+'</span></div>';
-    pHTML += '</div>';
-  }
-
-  var rw = d.or.toUpperCase();
-  var dw = d.rc.h > 0 ? d.rc.h+' dangerous clause'+(d.rc.h!==1?'s':'')+' that could cause financial loss' : 'issues that need attention';
-  var shareText = '⚠️ My rental agreement is '+rw+' RISK (Score: '+d.score+'/100) with '+dw+'. Get yours audited free — India\'s first AI rental auditor.';
-  var riskHint = RH[d.or] ? '<span style="font-size:10px;opacity:.8;font-weight:500;text-transform:none;letter-spacing:0"> · '+esc(RH[d.or])+'</span>' : '';
-
-  html += '<div class="stbar">📍 <strong>'+esc(d.state)+'</strong> + Central Indian Law</div>';
-  html += '<div class="rhead"><h2>Audit Results</h2><span class="rb '+RC[d.or]+'">'+(RL[d.or]||d.or)+riskHint+'</span></div>';
-  html += '<div class="sccard"><div>';
-  html += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#94a3b8;margin-bottom:3px">Agreement Score</div>';
-  html += '<div class="scnum">'+d.score+'<span>/100</span></div><div class="scconf">Confidence: '+d.oc+'%</div></div>';
-  html += '<div style="flex:1;min-width:0"><div class="scbg"><div class="scfill" id="scfill" style="width:0%;background:'+col+'"></div></div>';
-  html += '<div class="sclbl" style="color:'+col+'">'+sLabel(d.score)+'</div>';
-  html += '<div class="scpills"><span class="rb rh">🔴 '+d.rc.h+'</span><span class="rb rm">🟡 '+d.rc.m+'</span><span class="rb rl">🟢 '+d.rc.l+'</span></div></div></div>';
-  html += '<div class="sumcard"><h3>Overall Assessment</h3><p>'+esc(d.sum)+'</p></div>';
-  html += '<div class="ftitle">⚖️ Detailed Findings</div>';
-  html += fHTML + aHTML + mHTML + pHTML;
-
-  // Share card
-  html += '<div class="shcard"><h3>📤 Share &amp; Download</h3>';
-  html += '<div class="shprev">'+esc(shareText)+'</div>';
-  html += '<div class="shbtns">';
-  html += '<button class="sb" id="landlordbtn">📩 Send to Landlord</button>';
-  html += '<button class="sb sbcp" id="copybtn">📋 Copy <span class="toast" id="ctoast">Copied!</span></button>';
-  html += '<button class="sb sbwa" id="wabtn">💬 WhatsApp</button>';
-  html += '<button class="sb sbdl" id="dlbtn">🖨️ Download</button>';
-  html += '</div></div>';
-
-  // NEW: Rating card
-  html += '<div class="ratingcard" id="ratingCard">';
-  html += '<h3>⭐ Rate Your Experience</h3>';
-  html += '<p>Help us improve RentSafe AI for everyone</p>';
-  html += '<div class="stars" id="stars">';
-  for (i = 1; i <= 5; i++) html += '<span class="star" data-v="'+i+'">★</span>';
-  html += '</div>';
-  html += '<textarea class="rating-txt" id="ratingTxt" placeholder="Optional: share your thoughts…"></textarea>';
-  html += '<button class="rating-submit" id="ratingSubmit">Submit Feedback</button>';
-  html += '<div class="rating-thanks" id="ratingThanks">Thanks for helping us improve 🙌</div>';
-  html += '</div>';
-
-  html += '<div class="sumcard" style="border-left-color:#f59e0b;background:#fffbeb;margin-top:5px"><h3>Legal Disclaimer</h3><p>Informational only. Not legal advice. Consult a qualified advocate before signing.</p></div>';
-  html += '<button class="nabtn" id="resetbtn">← Audit Another Agreement</button>';
-
-  res.innerHTML = html;
-  res.classList.add('on');
-  res.scrollIntoView({ behavior:'smooth', block:'start' });
-  setTimeout(function(){ var sf=document.getElementById('scfill'); if(sf) sf.style.width=d.score+'%'; }, 100);
-
-  // ── Share buttons ──
-  document.getElementById('landlordbtn').addEventListener('click', function() {
-    var msg = 'Hi, I reviewed the rental agreement and found some clauses that may not comply with rental laws. Can we revise them before finalizing?';
-    navigator.clipboard.writeText(msg);
-    alert('Message copied. Send it to your landlord.');
-  });
-  document.getElementById('copybtn').addEventListener('click', function() {
-    navigator.clipboard.writeText(shareText).then(function() {
-      var t = document.getElementById('ctoast');
-      if (t) { t.classList.add('on'); setTimeout(function(){ t.classList.remove('on'); }, 2000); }
+      body: JSON.stringify({
+        model: 'llama3-70b-8192',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.2
+      })
     });
-  });
-  document.getElementById('wabtn').addEventListener('click', function() {
-    window.open('https://wa.me/?text='+encodeURIComponent(shareText), '_blank');
-  });
-  document.getElementById('dlbtn').addEventListener('click', function() { downloadReport(d); });
 
-  // ── NEW: Star rating logic ──
-  var selectedRating = 0;
-  var stars = document.querySelectorAll('.star');
-  stars.forEach(function(s) {
-    s.addEventListener('click', function() {
-      selectedRating = parseInt(this.getAttribute('data-v'));
-      stars.forEach(function(st, idx) { st.classList.toggle('on', idx < selectedRating); });
-    });
-    s.addEventListener('mouseover', function() {
-      var v = parseInt(this.getAttribute('data-v'));
-      stars.forEach(function(st, idx) { st.style.opacity = idx < v ? '1' : '0.3'; });
-    });
-    s.addEventListener('mouseout', function() {
-      stars.forEach(function(st, idx) { st.style.opacity = idx < selectedRating ? '1' : '0.3'; });
-    });
-  });
-  document.getElementById('ratingSubmit').addEventListener('click', function() {
-    if (!selectedRating) { alert('Please select a star rating first.'); return; }
-    // Save to localStorage
-    var reviews = JSON.parse(localStorage.getItem('rentsafe_reviews') || '[]');
-    reviews.push({ rating: selectedRating, feedback: document.getElementById('ratingTxt').value.trim(), ts: new Date().toISOString(), state: d.state, score: d.score });
-    localStorage.setItem('rentsafe_reviews', JSON.stringify(reviews));
-    // Show thank you
-    document.getElementById('ratingSubmit').style.display = 'none';
-    document.getElementById('ratingTxt').style.display = 'none';
-    document.getElementById('stars').style.pointerEvents = 'none';
-    document.getElementById('ratingThanks').style.display = 'block';
-  });
+    if (!response.ok) {
+      const errBody = await response.text();
+      console.error('Groq error:', errBody);
+      return res.status(502).json({ error: { message: 'AI service error. Please try again.' } });
+    }
 
-  // ── Reset ──
-  document.getElementById('resetbtn').addEventListener('click', function() {
-    res.classList.remove('on');
-    document.getElementById('txt').value = '';
-    pdfB64 = null; fsel.style.display='none'; dz.style.display='block'; fi.value='';
-    switchTab('paste'); selState=''; stsel.value=''; mcbtn.disabled=true; lastData=null;
-    document.getElementById('maincard').scrollIntoView({ behavior:'smooth' });
-  });
-}
+    const data = await response.json();
+    const raw = data.choices[0].message.content
+      .replace(/```json|```/g, '')
+      .trim();
 
-// ══════════════════════════════════════════
-// DOWNLOAD REPORT
-// ══════════════════════════════════════════
-function downloadReport(d) {
-  var col = sColor(d.score);
-  var PLP = { tenant:'👤 Tenant', landlord:'🏠 Landlord', both:'👥 Both' };
-  var i, f, body = '';
-  body += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #e5e7eb;flex-wrap:wrap;gap:8px">';
-  body += '<div><h1 style="font-size:17px;font-weight:800;color:#0f1a2e">🛡️ RentSafe AI Report</h1>';
-  body += '<p style="color:#6b7280;font-size:11px;margin-top:3px">'+new Date(d.ts).toLocaleString('en-IN')+' · '+esc(d.state)+'</p></div>';
-  body += '<div style="text-align:right"><div style="font-size:30px;font-weight:800;color:'+col+'">'+d.score+'<span style="font-size:14px;color:#6b7280">/100</span></div>';
-  body += '<div style="font-size:11px;font-weight:700;color:'+col+'">'+sLabel(d.score)+'</div></div></div>';
-  body += '<div style="background:#f8fafc;border:1px solid #e5e7eb;border-radius:7px;padding:9px 12px;margin-bottom:12px;font-size:12px">';
-  body += '<strong>'+d.or.toUpperCase()+' RISK</strong> · Confidence: '+d.oc+'% · 🔴 '+d.rc.h+' · 🟡 '+d.rc.m+' · 🟢 '+d.rc.l+'</div>';
-  body += '<div style="border:1px solid #e5e7eb;border-left:4px solid #0f1a2e;border-radius:7px;padding:12px;margin-bottom:12px">';
-  body += '<p style="font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#6b7280;margin-bottom:4px">Assessment</p>';
-  body += '<p style="font-size:13px;line-height:1.7">'+esc(d.sum)+'</p></div>';
-  body += '<h2 style="font-size:14px;font-weight:700;margin:14px 0 8px;color:#0f1a2e">⚖️ Findings</h2>';
-  for (i = 0; i < d.findings.length; i++) {
-    f = d.findings[i];
-    var bc=f.risk==='high'?'#ef4444':f.risk==='medium'?'#f59e0b':'#22c55e';
-    var bg=f.risk==='high'?'#fee2e2':f.risk==='medium'?'#fef3c7':'#dcfce7';
-    var fc=f.risk==='high'?'#991b1b':f.risk==='medium'?'#92400e':'#166534';
-    body += '<div style="border:1px solid #e5e7eb;border-left:4px solid '+bc+';border-radius:8px;padding:12px;margin-bottom:10px">';
-    body += '<div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px;margin-bottom:5px">';
-    body += '<strong>'+(i+1)+'. '+esc(f.title)+'</strong>';
-    body += '<span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:'+bg+';color:'+fc+'">'+f.risk.toUpperCase()+' '+f.confidence+'%</span></div>';
-    body += '<p style="font-size:13px;color:#374151;margin-bottom:5px">'+esc(f.explanation)+'</p>';
-    if (f.clause_ref) body += '<p style="font-size:12px;color:#475569;font-style:italic;margin-bottom:4px">📄 '+esc(f.clause_ref)+'</p>';
-    if (f.impact) body += '<p style="font-size:12px;background:#fffbeb;padding:5px 8px;border-radius:4px;color:#92400e;margin-bottom:4px">💡 '+esc(f.impact)+'</p>';
-    body += '<p style="font-size:12px;color:#3730a3">⚖️ '+esc(f.citation)+' · '+esc(PLP[f.perspective]||f.perspective)+'</p></div>';
+    JSON.parse(raw);
+
+    return res.status(200).json({
+      content: [{ type: 'text', text: raw }]
+    });
+
+  } catch (err) {
+    console.error(err);
+    if (err instanceof SyntaxError) {
+      return res.status(502).json({ error: { message: 'AI returned an unexpected response. Please try again.' } });
+    }
+    return res.status(500).json({ error: { message: 'Failed to process agreement. Please try again.' } });
   }
-  if (d.actions.length) {
-    body += '<div style="border:1px solid #e5e7eb;border-left:4px solid #6366f1;border-radius:8px;padding:12px;margin-bottom:10px">';
-    body += '<h3 style="font-size:13px;font-weight:700;margin-bottom:7px">✅ Recommended Actions</h3>';
-    for (i=0;i<d.actions.length;i++) body += '<p style="font-size:12px;margin-bottom:3px">'+(i+1)+'. '+esc(d.actions[i])+'</p>';
-    body += '</div>';
-  }
-  if (d.miss.length) {
-    body += '<div style="border:1px solid #fecaca;border-radius:7px;padding:12px;margin-bottom:10px">';
-    body += '<h3 style="font-size:13px;color:#991b1b;margin-bottom:6px">⚠️ Missing Clauses</h3>';
-    for (i=0;i<d.miss.length;i++) body += '<p style="font-size:12px;margin-bottom:3px">❌ '+esc(d.miss[i])+'</p>';
-    body += '</div>';
-  }
-  if (d.pos.length) {
-    body += '<div style="border:1px solid #bbf7d0;border-radius:7px;padding:12px;margin-bottom:10px">';
-    body += '<h3 style="font-size:13px;color:#166634;margin-bottom:6px">✅ Done Right</h3>';
-    for (i=0;i<d.pos.length;i++) body += '<p style="font-size:12px;margin-bottom:3px">✅ '+esc(d.pos[i])+'</p>';
-    body += '</div>';
-  }
-  body += '<p style="margin-top:14px;padding-top:10px;border-top:1px solid #e5e7eb;font-size:10px;color:#9ca3af">⚖️ Informational only. Not legal advice. · RentSafe AI · Vadodara</p>';
-  var fullHTML = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RentSafe AI Report</title>'
-    +'<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,sans-serif;color:#1f2937;padding:18px;max-width:780px;margin:0 auto}@media print{@page{margin:12mm}}</style>'
-    +'</head><body>'+body+'</body></html>';
-  var blob = new Blob([fullHTML],{type:'text/html'});
-  var url = URL.createObjectURL(blob);
-  window.open(url,'_blank');
-  setTimeout(function(){URL.revokeObjectURL(url);},3000);
-}
-</script>
+};
