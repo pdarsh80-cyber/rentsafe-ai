@@ -1,4 +1,14 @@
-const fetch = (...args) => import('node-fetch').then(({default: f}) => f(...args));
+const fetch = (...args) => import('node-fetch').then(({ default: f }) => f(...args));
+
+const FALLBACK = {
+  summary: "We couldn't fully analyze this agreement. Please try again.",
+  overall_risk: "medium",
+  overall_confidence: 50,
+  findings: [],
+  actions: ["Try again or paste the agreement text directly"],
+  missing_clauses: [],
+  positive_clauses: []
+};
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -7,12 +17,8 @@ module.exports = async function handler(req, res) {
 
   const { text, pdf, state } = req.body;
 
-  if (!state) {
-    return res.status(400).json({ error: { message: 'State is required.' } });
-  }
-  if (!text && !pdf) {
-    return res.status(400).json({ error: { message: 'Agreement text or PDF is required.' } });
-  }
+  if (!state) return res.status(400).json({ error: { message: 'State is required.' } });
+  if (!text && !pdf) return res.status(400).json({ error: { message: 'Agreement text or PDF is required.' } });
 
   let agreementText = text;
 
@@ -20,62 +26,30 @@ module.exports = async function handler(req, res) {
     try {
       const pdfParse = require('pdf-parse');
       const buffer = Buffer.from(pdf, 'base64');
-      const parsed = await pdfParse(buffer);
-      agreementText = parsed.text;
+      const result = await pdfParse(buffer);
+      agreementText = result.text;
       if (!agreementText || agreementText.trim().length < 50) {
-        return res.status(400).json({ error: { message: 'Could not extract text from the PDF. Try copying and pasting the text instead.' } });
+        return res.status(400).json({ error: { message: 'Could not extract text from PDF. Try pasting the text instead.' } });
       }
     } catch (e) {
-      console.error('PDF parse error:', e);
-      return res.status(400).json({ error: { message: 'Failed to read the PDF. Make sure it is not scanned or image-based.' } });
+      console.error('PDF error:', e);
+      return res.status(400).json({ error: { message: 'Failed to read PDF. Make sure it is not scanned or image-based.' } });
     }
   }
 
   const systemPrompt =
     `You are RentSafe AI, India's expert rental agreement auditor. ` +
-    `Return ONLY valid JSON. No explanation, no text outside JSON. No markdown, no backticks. ` +
+    `Return ONLY valid JSON. No explanation. No text outside JSON. No markdown. No backticks. ` +
     `Knowledge: Model Tenancy Act 2021, Transfer of Property Act 1882 S105-117, ` +
     `Registration Act 1908 S17, Indian Stamp Act 1899, ` +
-    `2026 New Rent Rules (digital registration mandatory; informal agreements void), ` +
-    `Indian Contract Act 1872, state norms for ${state}.\n\n` +
-    `Return ONLY this exact JSON structure:\n` +
-    `{"summary":"2-3 direct risk-first sentences",` +
-    `"overall_risk":"high|medium|low","overall_confidence":80,` +
-    `"findings":[{"title":"max 8 words","risk":"high|medium|low","confidence":80,` +
-    `"explanation":"2-3 plain sentences","impact":"1 sentence real consequence",` +
-    `"clause_ref":"max 15 word paraphrase of problematic clause",` +
-    `"citation":"Act Year Section","perspective":"tenant|landlord|both"}],` +
-    `"actions":["practical step max 15 words"],` +
-    `"missing_clauses":["clause"],"positive_clauses":["what is correct"]}\n` +
-    `Generate 3-5 findings and 3-5 actions. ` +
-    `If not a rental agreement return: {"error":"not_agreement","message":"friendly message"}`;
-
-  const userPrompt = `Audit this rental agreement for ${state}. Return JSON only.\n\n${agreementText}`;
-
-  // Fallback response if AI fails
-  const fallback = {
-    content: [{
-      type: 'text',
-      text: JSON.stringify({
-        summary: "We couldn't fully analyze this agreement. Please try again or paste the text manually.",
-        overall_risk: "medium",
-        overall_confidence: 50,
-        findings: [{
-          title: "Analysis incomplete",
-          risk: "medium",
-          confidence: 50,
-          explanation: "The AI could not process this agreement fully. Please try again.",
-          impact: "Unable to determine risk without full analysis.",
-          clause_ref: "",
-          citation: "Please retry",
-          perspective: "both"
-        }],
-        actions: ["Try again by pasting the agreement text directly", "Make sure the agreement is in English", "Try a shorter section of the agreement first"],
-        missing_clauses: [],
-        positive_clauses: []
-      })
-    }]
-  };
+    `2026 New Rent Rules, Indian Contract Act 1872, state norms for ${state}.\n\n` +
+    `Return ONLY this JSON structure with no extra text:\n` +
+    `{"summary":"string","overall_risk":"high|medium|low","overall_confidence":80,` +
+    `"findings":[{"title":"string","risk":"high|medium|low","confidence":80,` +
+    `"explanation":"string","impact":"string","clause_ref":"string",` +
+    `"citation":"string","perspective":"tenant|landlord|both"}],` +
+    `"actions":["string"],"missing_clauses":["string"],"positive_clauses":["string"]}\n` +
+    `If not a rental agreement return: {"error":"not_agreement","message":"string"}`;
 
   try {
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -88,46 +62,42 @@ module.exports = async function handler(req, res) {
         model: 'llama3-70b-8192',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
+          { role: 'user', content: `Audit this rental agreement for ${state}. Return JSON only.\n\n${agreementText}` }
         ],
-        temperature: 0.2,
+        temperature: 0.1,
         max_tokens: 2000
       })
     });
 
     if (!response.ok) {
-      const errBody = await response.text();
-      console.error('Groq error:', errBody);
-      return res.status(200).json(fallback);
+      console.error('Groq HTTP error:', response.status, await response.text());
+      return res.status(200).json(FALLBACK);
     }
 
     const data = await response.json();
 
-    // Validate Groq response structure
-    if (!data || !data.choices || !data.choices[0] || !data.choices[0].message) {
-      console.error('Invalid Groq response structure:', data);
-      return res.status(200).json(fallback);
+    if (!data?.choices?.[0]?.message?.content) {
+      console.error('Bad Groq response:', JSON.stringify(data));
+      return res.status(200).json(FALLBACK);
     }
 
     const raw = data.choices[0].message.content
       .replace(/```json|```/g, '')
       .trim();
 
-    // Safe JSON parsing — never crash
     let parsed;
     try {
       parsed = JSON.parse(raw);
     } catch (e) {
-      console.error('Invalid JSON from AI:', raw);
-      return res.status(200).json(fallback);
+      console.error('JSON parse failed. Raw output:', raw);
+      return res.status(200).json(FALLBACK);
     }
 
-    return res.status(200).json({
-      content: [{ type: 'text', text: JSON.stringify(parsed) }]
-    });
+    // Return direct JSON — no wrapping
+    return res.status(200).json(parsed);
 
   } catch (err) {
     console.error('Handler error:', err);
-    return res.status(200).json(fallback);
+    return res.status(200).json(FALLBACK);
   }
 };
