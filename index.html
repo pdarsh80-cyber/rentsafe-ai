@@ -359,8 +359,7 @@ async function runAudit(){
     clearTimeout(timeout);
     var data=await response.json();
     if(data.error)throw new Error(data.error.message);
-    var raw=data.content.map(function(b){return b.text||'';}).join('').replace(/```json|```/g,'').trim();
-    var result=JSON.parse(raw);
+    var result = data;
     if(result.error==='not_agreement'){setLdr(false);showErr(result.message||'This does not appear to be a rental agreement.');return;}
     for(var i=0;i<result.findings.length;i++)result.findings[i].confidence=boostConf(result.findings[i],result.findings[i].confidence);
     var score=calcScore(result.findings);
