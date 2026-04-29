@@ -59,7 +59,7 @@ module.exports = async function handler(req, res) {
         Authorization: `Bearer ${process.env.GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'llama3-70b-8192',
+        model: 'llama-3.3-70b-versatile',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: `Audit this rental agreement for ${state}. Return JSON only.\n\n${agreementText}` }
