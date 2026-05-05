@@ -1,7 +1,7 @@
 {
   "_meta": {
     "description": "Curated catalog of common void / exploitative clauses found in Indian rental agreements, with the legal basis for why they're void and a compliant replacement. Used by the audit pipeline to detect known patterns and propose redlined fixes.",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "last_updated": "2026-05-04",
     "review_cadence_days": 90
   },
@@ -9,11 +9,25 @@
     {
       "id": "vc-deposit-over-2mo-residential",
       "title": "Security deposit exceeds 2 months' rent (residential)",
-      "pattern_keywords": ["security deposit", "advance", "caution money", "months rent"],
+      "pattern_keywords": [
+        "security deposit",
+        "advance",
+        "caution money",
+        "months rent"
+      ],
       "pattern_description": "Any clause that requires a residential tenant to pay a security deposit greater than 2 months of monthly rent.",
       "why_void": "The Model Tenancy Act 2021, Section 11(1), caps residential security deposits at 2 months' rent. Anything above that is unenforceable in MTA-adopting states.",
-      "citation_ids": ["mta-2021-s11-1"],
-      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA"],
+      "citation_ids": [
+        "mta-2021-s11-1"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA"
+      ],
       "severity": "high",
       "replacement_clause": "The Tenant shall pay a refundable security deposit equivalent to two (2) months of the monthly rent, returnable within one (1) month of vacating the premises after deducting any verified outstanding dues.",
       "perspective": "tenant"
@@ -21,11 +35,24 @@
     {
       "id": "vc-deposit-over-6mo-commercial",
       "title": "Security deposit exceeds 6 months' rent (commercial)",
-      "pattern_keywords": ["security deposit", "commercial", "non-residential"],
+      "pattern_keywords": [
+        "security deposit",
+        "commercial",
+        "non-residential"
+      ],
       "pattern_description": "Commercial lease requiring more than 6 months' rent as security.",
       "why_void": "Model Tenancy Act 2021, Section 11(1), caps commercial security deposits at 6 months' rent.",
-      "citation_ids": ["mta-2021-s11-1"],
-      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA"],
+      "citation_ids": [
+        "mta-2021-s11-1"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA"
+      ],
       "severity": "high",
       "replacement_clause": "The Tenant shall pay a refundable security deposit equivalent to six (6) months of the monthly rent, returnable within one (1) month of vacating the premises after deducting any verified outstanding dues.",
       "perspective": "tenant"
@@ -33,11 +60,28 @@
     {
       "id": "vc-deposit-non-refundable",
       "title": "Security deposit declared non-refundable",
-      "pattern_keywords": ["non-refundable", "forfeited", "deposit", "shall not be returned"],
+      "pattern_keywords": [
+        "non-refundable",
+        "forfeited",
+        "deposit",
+        "shall not be returned"
+      ],
       "pattern_description": "Clause stating the security deposit is non-refundable or forfeited under any circumstances.",
       "why_void": "Security deposits are a custodial sum, not consideration. Forfeiting the entire deposit is an unconscionable bargain under the Indian Contract Act 1872, Section 23, and contrary to the refund obligation implied by MTA Section 11(2).",
-      "citation_ids": ["mta-2021-s11-2", "ica-1872-s23"],
-      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA", "MH", "GJ"],
+      "citation_ids": [
+        "mta-2021-s11-2",
+        "ica-1872-s23"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA",
+        "MH",
+        "GJ"
+      ],
       "severity": "high",
       "replacement_clause": "The security deposit is refundable to the Tenant within one (1) month of the Tenant vacating the premises, after lawful deduction of any verified outstanding rent, utility dues, or actual repair costs (excluding normal wear and tear).",
       "perspective": "tenant"
@@ -45,11 +89,26 @@
     {
       "id": "vc-rent-hike-no-notice",
       "title": "Landlord may increase rent without notice or limit",
-      "pattern_keywords": ["increase rent", "revise rent", "without notice", "at landlord's discretion"],
+      "pattern_keywords": [
+        "increase rent",
+        "revise rent",
+        "without notice",
+        "at landlord's discretion"
+      ],
       "pattern_description": "Clause permitting unilateral rent increases without a written notice period or capped frequency.",
       "why_void": "MTA-derived rules require at least 90 days' written notice of any rent increase, and rent may be revised only once in a 12-month period unless the agreement specifies an escalation clause with a defined formula.",
-      "citation_ids": ["mta-2021-s9-1", "mta-2021-s9-2"],
-      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA"],
+      "citation_ids": [
+        "mta-2021-s9-1",
+        "mta-2021-s9-2"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA"
+      ],
       "severity": "medium",
       "replacement_clause": "Rent may be revised once every twelve (12) months. The Landlord shall provide the Tenant with written notice of any revision at least ninety (90) days prior to the revised rent taking effect.",
       "perspective": "tenant"
@@ -57,11 +116,25 @@
     {
       "id": "vc-eviction-no-cause",
       "title": "Landlord may evict tenant without cause",
-      "pattern_keywords": ["evict", "vacate immediately", "at landlord's sole discretion", "without reason"],
+      "pattern_keywords": [
+        "evict",
+        "vacate immediately",
+        "at landlord's sole discretion",
+        "without reason"
+      ],
       "pattern_description": "Clause permitting the landlord to evict the tenant without cause or due process.",
       "why_void": "Under MTA Section 21, eviction must be sought through the Rent Authority and only on enumerated grounds. Self-help eviction or eviction without notice and cause is not permitted.",
-      "citation_ids": ["mta-2021-s21-1", "mta-2021-s21-2"],
-      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA"],
+      "citation_ids": [
+        "mta-2021-s21-1"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA"
+      ],
       "severity": "high",
       "replacement_clause": "The Landlord may seek eviction of the Tenant only through the designated Rent Authority and only on grounds enumerated in the applicable state tenancy law, including non-payment of rent for two consecutive months, material breach, or unauthorised use.",
       "perspective": "tenant"
@@ -69,11 +142,26 @@
     {
       "id": "vc-no-essential-services",
       "title": "Landlord may cut off essential services",
-      "pattern_keywords": ["water", "electricity", "essential services", "disconnect", "cut off"],
+      "pattern_keywords": [
+        "water",
+        "electricity",
+        "essential services",
+        "disconnect",
+        "cut off"
+      ],
       "pattern_description": "Clause permitting landlord to disconnect water, electricity, or essential supplies as a means of enforcing rent collection or vacation.",
       "why_void": "MTA Section 20 prohibits landlords from withholding essential services. Doing so creates a cause of action for the tenant.",
-      "citation_ids": ["mta-2021-s20"],
-      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA"],
+      "citation_ids": [
+        "mta-2021-s20"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA"
+      ],
       "severity": "high",
       "replacement_clause": "The Landlord shall not withhold or disconnect any essential supply or service (including water and electricity) to the premises during the tenancy.",
       "perspective": "tenant"
@@ -81,11 +169,26 @@
     {
       "id": "vc-blanket-repair-on-tenant",
       "title": "All repairs at tenant's cost",
-      "pattern_keywords": ["all repairs", "structural", "maintenance", "at tenant's cost"],
+      "pattern_keywords": [
+        "all repairs",
+        "structural",
+        "maintenance",
+        "at tenant's cost"
+      ],
       "pattern_description": "Clause requiring the tenant to bear all repair costs, including structural repairs.",
       "why_void": "MTA Section 15 allocates structural and major repairs to the landlord. Day-to-day maintenance may be allocated to the tenant. A blanket transfer of all repair obligations to the tenant is unenforceable.",
-      "citation_ids": ["mta-2021-s15-1", "mta-2021-s15-2"],
-      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA"],
+      "citation_ids": [
+        "mta-2021-s15-1",
+        "mta-2021-s15-2"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA"
+      ],
       "severity": "medium",
       "replacement_clause": "The Landlord shall be responsible for structural repairs and major maintenance (roof, walls, plumbing, wiring). The Tenant shall be responsible for day-to-day minor maintenance such as fuses, taps, drains, and consumables.",
       "perspective": "tenant"
@@ -93,11 +196,27 @@
     {
       "id": "vc-no-registration",
       "title": "Agreement not registered or stamp-duty avoided",
-      "pattern_keywords": ["unregistered", "11 months", "no stamp duty"],
+      "pattern_keywords": [
+        "unregistered",
+        "11 months",
+        "no stamp duty"
+      ],
       "pattern_description": "Tenancy term equal to or exceeding 12 months without provision for digital registration with the Rent Authority within 60 days, or no stamp duty paid.",
-      "why_void": "Under the New Rent Rules 2026 and Registration Act 1908 Section 17, a written tenancy agreement must be digitally stamped and registered with the designated Rent Authority within 60 days of signing. Failure attracts a ₹5,000+ penalty (state-dependent) and may render the agreement inadmissible as evidence.",
-      "citation_ids": ["reg-act-1908-s17", "mta-2021-s4-2"],
-      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA", "MH", "GJ"],
+      "why_void": "Under the New Rent Rules 2026 and Registration Act 1908 Section 17, a written tenancy agreement must be digitally stamped and registered with the designated Rent Authority within 60 days of signing. Failure attracts a Rs.5,000+ penalty (state-dependent) and may render the agreement inadmissible as evidence.",
+      "citation_ids": [
+        "reg-act-1908-s17",
+        "mta-2021-s4-2"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA",
+        "MH",
+        "GJ"
+      ],
       "severity": "high",
       "replacement_clause": "Both parties agree to digitally stamp and register this agreement with the designated Rent Authority within sixty (60) days of execution. The cost of stamp duty and registration shall be shared equally unless otherwise agreed in writing.",
       "perspective": "both"
@@ -105,11 +224,27 @@
     {
       "id": "vc-late-fee-excessive",
       "title": "Excessive late-payment penalty",
-      "pattern_keywords": ["late fee", "penalty", "per day", "compound interest"],
+      "pattern_keywords": [
+        "late fee",
+        "penalty",
+        "per day",
+        "compound interest"
+      ],
       "pattern_description": "Late-payment charges that are punitive (e.g., compound interest, daily fees exceeding 2%/month).",
       "why_void": "Indian Contract Act 1872, Section 74, only permits 'reasonable compensation' for breach. Punitive penalties beyond actual loss are not enforceable. Courts have generally treated 18-24% p.a. simple interest as the upper bound for late-rent fees.",
-      "citation_ids": ["ica-1872-s74"],
-      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA", "MH", "GJ"],
+      "citation_ids": [
+        "ica-1872-s74"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA",
+        "MH",
+        "GJ"
+      ],
       "severity": "medium",
       "replacement_clause": "If rent is not paid within seven (7) days of the due date, the Tenant shall pay simple interest at 1.5% per month (18% per annum) on the unpaid amount until paid in full.",
       "perspective": "tenant"
@@ -117,13 +252,586 @@
     {
       "id": "vc-blanket-inspection-anytime",
       "title": "Landlord may enter premises any time",
-      "pattern_keywords": ["enter premises", "inspection", "at any time", "without notice"],
+      "pattern_keywords": [
+        "enter premises",
+        "inspection",
+        "at any time",
+        "without notice"
+      ],
       "pattern_description": "Clause allowing the landlord to enter the premises at any time without notice.",
       "why_void": "MTA Section 18 requires the landlord to give the tenant at least 24 hours' written notice before entering, except in emergencies (fire, structural collapse, etc.).",
-      "citation_ids": ["mta-2021-s18"],
-      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA"],
+      "citation_ids": [
+        "mta-2021-s18"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA"
+      ],
       "severity": "medium",
       "replacement_clause": "The Landlord may enter the premises only after giving the Tenant at least twenty-four (24) hours' prior written notice, and only at reasonable hours, except in case of emergency (fire, flood, structural risk).",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-deposit-forfeit-early-exit",
+      "title": "Entire deposit forfeited on early termination",
+      "pattern_keywords": [
+        "forfeit",
+        "deposit",
+        "early termination",
+        "vacate before"
+      ],
+      "pattern_description": "Clause stating the security deposit is fully forfeited if the tenant vacates before the agreed term.",
+      "why_void": "Under Indian Contract Act Section 74, only reasonable compensation for actual loss is recoverable for breach. Total forfeiture of a multi-month deposit far exceeds typical re-letting costs and is not enforceable.",
+      "citation_ids": [
+        "ica-1872-s74",
+        "mta-2021-s11-2"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA",
+        "MH",
+        "GJ"
+      ],
+      "severity": "high",
+      "replacement_clause": "If the Tenant vacates before the end of the term, the Landlord may deduct from the security deposit only the actual rent for the period the premises remain unlet, up to a maximum of one (1) month, plus any verified outstanding dues. The balance shall be refunded.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-lockin-excessive",
+      "title": "Lock-in penalty exceeds one month's rent",
+      "pattern_keywords": [
+        "lock-in",
+        "lock in",
+        "minimum stay",
+        "minimum period",
+        "penalty"
+      ],
+      "pattern_description": "Lock-in clause that levies a penalty greater than one month's rent if the tenant exits early.",
+      "why_void": "ICA Section 74 caps damages at reasonable compensation for actual loss. Courts have generally accepted up to one month's rent as a lock-in penalty; amounts beyond that are punitive and unenforceable.",
+      "citation_ids": [
+        "ica-1872-s74"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA",
+        "MH",
+        "GJ"
+      ],
+      "severity": "medium",
+      "replacement_clause": "If the Tenant exits before completing six (6) months of the term, the Tenant shall pay one (1) month's rent as compensation in lieu of notice. No further penalty shall apply.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-tenant-notice-excessive",
+      "title": "Tenant must give more than one month's notice",
+      "pattern_keywords": [
+        "tenant shall give",
+        "notice period",
+        "two months",
+        "three months",
+        "vacating"
+      ],
+      "pattern_description": "Notice period required from the tenant exceeds one month for a residential tenancy.",
+      "why_void": "MTA Section 22 sets one month as the standard notice period for terminating a tenancy. A longer notice obligation imposed unilaterally on the tenant is one-sided and unenforceable.",
+      "citation_ids": [
+        "mta-2021-s22"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA"
+      ],
+      "severity": "medium",
+      "replacement_clause": "Either party may terminate this agreement by giving the other party at least one (1) month's prior written notice.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-landlord-no-notice-termination",
+      "title": "Landlord may terminate without notice",
+      "pattern_keywords": [
+        "landlord may terminate",
+        "without notice",
+        "with immediate effect",
+        "at landlord's discretion"
+      ],
+      "pattern_description": "Clause permitting the landlord to terminate the tenancy with no notice or with immediate effect outside enumerated grounds.",
+      "why_void": "MTA Section 22 requires at least one month's notice from either party. MTA Section 21 limits eviction to enumerated grounds and to the Rent Authority's process. Self-help termination by the landlord is not permitted.",
+      "citation_ids": [
+        "mta-2021-s22",
+        "mta-2021-s21-1"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA"
+      ],
+      "severity": "high",
+      "replacement_clause": "The Landlord may terminate this agreement only by giving the Tenant at least one (1) month's prior written notice, and only on the grounds specified in the applicable state tenancy law. Eviction shall be sought through the Rent Authority.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-tenant-pays-property-tax",
+      "title": "Tenant pays the landlord's property tax",
+      "pattern_keywords": [
+        "property tax",
+        "municipal tax",
+        "tenant shall pay",
+        "house tax"
+      ],
+      "pattern_description": "Clause shifting the landlord's property tax / municipal tax / house tax obligation onto the tenant.",
+      "why_void": "Property tax is a charge on the owner. Under MTA Schedule II and Section 15(2), this obligation cannot be transferred to the tenant by agreement.",
+      "citation_ids": [
+        "mta-2021-s15-2",
+        "mta-2021-schedule-ii"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA"
+      ],
+      "severity": "medium",
+      "replacement_clause": "Property tax, municipal taxes, and other levies on the premises shall be borne by the Landlord. The Tenant is liable only for utility consumption charges (electricity, water, gas, internet) actually used during the tenancy.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-tenant-pays-society-maintenance",
+      "title": "Tenant pays full society maintenance",
+      "pattern_keywords": [
+        "society maintenance",
+        "monthly maintenance",
+        "association charges",
+        "tenant shall pay"
+      ],
+      "pattern_description": "Tenant required to pay the entire society / association / maintenance charge of the premises.",
+      "why_void": "Under MTA Schedule II, society maintenance attributable to the property as an asset (sinking fund, structural repair contributions) is a landlord obligation. Only consumption-based charges (water, security, electricity for common areas) may be passed to the tenant if expressly agreed.",
+      "citation_ids": [
+        "mta-2021-schedule-ii",
+        "mta-2021-s15-2"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA"
+      ],
+      "severity": "low",
+      "replacement_clause": "The Tenant shall pay the consumption-based component of society maintenance (water, common-area electricity, security). Any sinking-fund contribution or structural repair component shall be borne by the Landlord.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-tenant-major-appliance-repair",
+      "title": "Tenant pays for major appliance / fixture repairs",
+      "pattern_keywords": [
+        "air conditioner",
+        "geyser",
+        "appliance",
+        "repair",
+        "tenant's cost",
+        "major"
+      ],
+      "pattern_description": "Clause obliging the tenant to repair or replace major landlord-provided appliances or fixtures (AC, geyser, refrigerator) at the tenant's cost.",
+      "why_void": "Under Schedule II of the MTA, major appliance and fixture repairs are the landlord's responsibility unless damage is caused by the tenant's negligence. A blanket transfer is unenforceable under Section 15(2).",
+      "citation_ids": [
+        "mta-2021-schedule-ii",
+        "mta-2021-s15-2"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA"
+      ],
+      "severity": "medium",
+      "replacement_clause": "Repair or replacement of landlord-provided appliances and fixtures (AC, geyser, refrigerator, fans, lights) shall be at the Landlord's cost, unless the damage is caused by the Tenant's proven negligence or wilful damage.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-tenant-indemnify-landlord-negligence",
+      "title": "Tenant indemnifies landlord for landlord's own negligence",
+      "pattern_keywords": [
+        "indemnify",
+        "hold harmless",
+        "any cause",
+        "all claims"
+      ],
+      "pattern_description": "Indemnity clause requiring the tenant to indemnify the landlord for losses including those caused by the landlord's own negligence or default.",
+      "why_void": "Indian Contract Act Section 23 voids agreements opposed to public policy. Indemnifying a party for its own negligence is consistently held to be against public policy and unenforceable.",
+      "citation_ids": [
+        "ica-1872-s23"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA",
+        "MH",
+        "GJ"
+      ],
+      "severity": "high",
+      "replacement_clause": "The Tenant shall indemnify the Landlord only against losses arising directly from the Tenant's own breach of this agreement or wilful damage. Indemnity does not extend to losses arising from the Landlord's negligence, default, or breach.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-no-guests-overbroad",
+      "title": "Tenant cannot host any guests / visitors",
+      "pattern_keywords": [
+        "no guests",
+        "no visitors",
+        "permission to bring",
+        "overnight"
+      ],
+      "pattern_description": "Clause forbidding the tenant from hosting guests or visitors of any kind.",
+      "why_void": "A blanket bar on guests and visitors is an unreasonable restriction on the tenant's quiet enjoyment of the premises. Reasonable restrictions on long-term occupants (e.g., 30+ days, which approaches sub-letting) are valid; total bans are not.",
+      "citation_ids": [
+        "mta-2021-s14"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA"
+      ],
+      "severity": "low",
+      "replacement_clause": "The Tenant may host guests and short-term visitors. Any guest staying for more than thirty (30) consecutive days requires the Landlord's prior written consent, which shall not be unreasonably withheld.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-waive-rent-authority",
+      "title": "Tenant waives right to approach Rent Authority",
+      "pattern_keywords": [
+        "shall not approach",
+        "shall not file complaint",
+        "rent authority",
+        "waive"
+      ],
+      "pattern_description": "Clause attempting to bar the tenant from filing a complaint with the Rent Authority or any statutory body.",
+      "why_void": "MTA Section 32 vests jurisdiction over tenancy disputes in the Rent Authority and Rent Court. Section 32 also bars contracting out of that jurisdiction. Such waivers are void.",
+      "citation_ids": [
+        "mta-2021-s32",
+        "ica-1872-s23"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA"
+      ],
+      "severity": "high",
+      "replacement_clause": "Nothing in this agreement shall restrict either party's right to approach the Rent Authority, Rent Court, or any other statutory body for redress under applicable law.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-arbitration-outside-rent-authority",
+      "title": "Mandatory arbitration outside the Rent Authority",
+      "pattern_keywords": [
+        "arbitration",
+        "sole arbitrator",
+        "exclusive jurisdiction",
+        "civil court"
+      ],
+      "pattern_description": "Clause mandating private arbitration or exclusive civil-court jurisdiction for tenancy disputes.",
+      "why_void": "MTA Section 32 places exclusive jurisdiction over enumerated tenancy matters in the Rent Authority. Tenancy disputes are not arbitrable to the extent they fall within Section 32.",
+      "citation_ids": [
+        "mta-2021-s32"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA"
+      ],
+      "severity": "medium",
+      "replacement_clause": "Disputes falling within the jurisdiction of the Rent Authority under the applicable state tenancy law shall be referred to the Rent Authority. All other disputes shall be subject to the courts at [city], [state].",
+      "perspective": "both"
+    },
+    {
+      "id": "vc-no-receipt",
+      "title": "Tenant waives right to rent receipt",
+      "pattern_keywords": [
+        "no receipt",
+        "without receipt",
+        "rent receipt",
+        "shall not demand"
+      ],
+      "pattern_description": "Clause stating the tenant cannot demand a rent receipt or that the landlord need not issue one.",
+      "why_void": "Rent receipts are required for the tenant to claim HRA exemption under Income Tax Act Section 10(13A) and to maintain a record for stamp/registration purposes. A waiver of this right is against public policy under ICA Section 23.",
+      "citation_ids": [
+        "ica-1872-s23"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA",
+        "MH",
+        "GJ"
+      ],
+      "severity": "medium",
+      "replacement_clause": "The Landlord shall issue a signed rent receipt for every rent payment, either in physical form or via an electronic acknowledgment (UPI / bank transfer reference), within seven (7) days of payment.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-damage-landlord-discretion",
+      "title": "Damage charges at landlord's sole discretion",
+      "pattern_keywords": [
+        "sole discretion",
+        "landlord shall determine",
+        "damage",
+        "deduct"
+      ],
+      "pattern_description": "Clause allowing the landlord to determine damage charges unilaterally, without itemized basis or independent verification.",
+      "why_void": "ICA Section 74 requires deductions to be based on reasonable, demonstrable compensation. Unilateral, undocumented assessments are not enforceable.",
+      "citation_ids": [
+        "ica-1872-s74",
+        "mta-2021-s11-2"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA",
+        "MH",
+        "GJ"
+      ],
+      "severity": "medium",
+      "replacement_clause": "Any deduction from the security deposit for damage shall be based on an itemized list provided to the Tenant in writing, supported by photographs and verifiable repair quotations or invoices. Normal wear and tear is excluded.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-cctv-private-areas",
+      "title": "Surveillance / CCTV inside private premises",
+      "pattern_keywords": [
+        "cctv",
+        "camera",
+        "surveillance",
+        "monitor",
+        "inside the premises"
+      ],
+      "pattern_description": "Clause permitting the landlord to install or maintain cameras inside private areas of the rented premises.",
+      "why_void": "The right to privacy is a fundamental right under Article 21 (K.S. Puttaswamy v. Union of India, 2017). Surveillance of a tenant's private living areas without consent violates this right and is not enforceable.",
+      "citation_ids": [
+        "constitution-art21",
+        "ica-1872-s23"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA",
+        "MH",
+        "GJ"
+      ],
+      "severity": "high",
+      "replacement_clause": "No camera, recording device, or surveillance equipment shall be installed inside any private area of the rented premises (rooms, bathrooms, kitchen). Cameras may be installed at the entrance / common areas only with the Tenant's written consent.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-religion-diet-restriction",
+      "title": "Restrictions based on religion or diet",
+      "pattern_keywords": [
+        "non-vegetarian",
+        "vegetarian only",
+        "religion",
+        "caste",
+        "community"
+      ],
+      "pattern_description": "Clause restricting the tenant's lifestyle on the basis of religion, caste, community, or diet.",
+      "why_void": "Such restrictions, when imposed in a manner that excludes or harasses tenants on protected grounds, raise concerns under Articles 14 and 15 of the Constitution and are increasingly held to be against public policy under ICA Section 23. Several state High Courts have struck down 'vegetarian-only' rental and society rules.",
+      "citation_ids": [
+        "ica-1872-s23"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA",
+        "MH",
+        "GJ"
+      ],
+      "severity": "medium",
+      "replacement_clause": "The Tenant's lifestyle, dietary, or religious practices shall not be restricted by this agreement, save for reasonable rules on noise, cleanliness, and statutory compliance applicable to all occupants.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-tenant-cant-install-safety",
+      "title": "Tenant cannot install basic safety equipment",
+      "pattern_keywords": [
+        "cannot install",
+        "no fixtures",
+        "smoke alarm",
+        "lock",
+        "safety",
+        "child gate"
+      ],
+      "pattern_description": "Clause preventing the tenant from installing reasonable safety equipment (smoke detectors, secondary locks, child gates, baby-proofing) even at the tenant's own cost.",
+      "why_void": "A blanket ban on temporary safety installations conflicts with the tenant's right to safe occupation and may amount to an unreasonable restriction under public policy (ICA Section 23).",
+      "citation_ids": [
+        "ica-1872-s23"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA",
+        "MH",
+        "GJ"
+      ],
+      "severity": "low",
+      "replacement_clause": "The Tenant may install removable safety equipment (smoke alarms, secondary locks, child gates, baby-proofing) at the Tenant's cost, provided no permanent damage is caused. The Tenant shall remove such fixtures at the end of the tenancy.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-brokerage-every-renewal",
+      "title": "Tenant pays brokerage on every renewal",
+      "pattern_keywords": [
+        "brokerage",
+        "broker fee",
+        "every renewal",
+        "renewal fee"
+      ],
+      "pattern_description": "Clause obliging the tenant to pay brokerage / agent commission again on each renewal of the agreement.",
+      "why_void": "Brokerage is consideration for arranging the tenancy, payable at most once per tenant-landlord pairing. Repeated brokerage on auto-renewal with the same parties has no consideration and is not enforceable under ICA.",
+      "citation_ids": [
+        "ica-1872-s23"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA",
+        "MH",
+        "GJ"
+      ],
+      "severity": "low",
+      "replacement_clause": "Brokerage, if any, shall be payable only at the inception of the tenancy. No further brokerage shall be payable on renewal between the same parties.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-auto-renewal-landlord-only",
+      "title": "Auto-renewal at landlord's discretion only",
+      "pattern_keywords": [
+        "auto-renew",
+        "automatically renewed",
+        "landlord may renew",
+        "extend"
+      ],
+      "pattern_description": "Clause that auto-renews the tenancy at the landlord's option, including any unilateral rent escalation, without the tenant's consent.",
+      "why_void": "Renewal of a contract requires the consent of both parties. A unilateral renewal right that binds the tenant without their agreement violates basic contract principles (ICA) and the rent-revision restrictions of MTA Section 9(2).",
+      "citation_ids": [
+        "ica-1872-s23",
+        "mta-2021-s9-2"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA"
+      ],
+      "severity": "medium",
+      "replacement_clause": "Renewal of this agreement requires the written consent of both parties. Any rent revision on renewal shall comply with the 90-day notice requirement under applicable law.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-joint-several-unrelated",
+      "title": "Joint and several liability beyond tenant's share",
+      "pattern_keywords": [
+        "joint and several",
+        "jointly and severally liable",
+        "co-tenant"
+      ],
+      "pattern_description": "Clause making each unrelated co-tenant individually liable for the entire rent and damages, regardless of their share or actual involvement in any default.",
+      "why_void": "Imposing the entire liability of a defaulting co-tenant on an unrelated co-tenant who has paid their own share is unconscionable and against public policy under ICA Section 23, particularly where the parties are not family or business partners.",
+      "citation_ids": [
+        "ica-1872-s23",
+        "ica-1872-s74"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA",
+        "MH",
+        "GJ"
+      ],
+      "severity": "medium",
+      "replacement_clause": "Each Tenant shall be liable for their proportionate share of the rent, deposit, and damages. Joint and several liability shall apply only to amounts actually attributable to that Tenant or to damage they have caused.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-tenant-must-repaint-on-exit",
+      "title": "Tenant must repaint the premises before vacating",
+      "pattern_keywords": [
+        "repaint",
+        "painting",
+        "whitewash",
+        "at tenant cost",
+        "before vacating"
+      ],
+      "pattern_description": "Clause requiring the tenant to repaint or whitewash the premises at their own cost as a condition of vacating.",
+      "why_void": "Under MTA Schedule II, whitewashing of walls and painting of doors and windows is the landowner's responsibility. Section 15(2) bars shifting this obligation to the tenant by agreement. Charging the tenant for routine repainting amounts to making them pay for normal wear and tear.",
+      "citation_ids": [
+        "mta-2021-schedule-ii",
+        "mta-2021-s15-2"
+      ],
+      "jurisdictions": [
+        "national",
+        "TN",
+        "AP",
+        "UP",
+        "AS",
+        "KA"
+      ],
+      "severity": "medium",
+      "replacement_clause": "Routine whitewashing and painting of the premises shall be at the Landlord's cost. The Tenant is liable only for repair of damage beyond normal wear and tear, supported by itemized evidence.",
       "perspective": "tenant"
     }
   ]

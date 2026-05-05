@@ -1,0 +1,27 @@
+# Normalize line endings on commit; check out with the platform's native ending.
+# This makes Git stop warning about LF/CRLF for text files.
+* text=auto
+
+# Force LF for files that should always be LF, regardless of platform.
+*.js   text eol=lf
+*.json text eol=lf
+*.html text eol=lf
+*.css  text eol=lf
+*.md   text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+
+# Mark binary files explicitly so Git never tries to convert them.
+*.pdf  binary
+*.docx binary
+*.xlsx binary
+*.pptx binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.ico  binary
+*.zip  binary
+*.woff  binary
+*.woff2 binary
