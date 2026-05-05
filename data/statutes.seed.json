@@ -1,0 +1,145 @@
+{
+  "_meta": {
+    "description": "Seed corpus for the RentSafe AI legal knowledge base. Add one entry per atomic statute section. Run scripts/embed.js after each batch to refresh embeddings.",
+    "version": "0.1.0",
+    "last_updated": "2026-05-04"
+  },
+  "statutes": [
+    {
+      "id": "mta-2021-s4-2",
+      "act_id": "mta-2021",
+      "act_name": "Model Tenancy Act, 2021",
+      "section": "4(2)",
+      "jurisdiction": "national",
+      "text": "Every tenancy entered into after the commencement of this Act shall be in writing and shall be informed by way of an application to the Rent Authority by the landowner and tenant jointly within two months from the date of the tenancy agreement.",
+      "plain_summary": "All new tenancies must be in writing and registered with the Rent Authority jointly by landlord and tenant within 60 days.",
+      "topics": ["registration", "written_agreement"],
+      "effective_from": "2021-06-02",
+      "last_verified": "2026-05-04",
+      "source_url": "https://mohua.gov.in/upload/uploadfiles/files/1Final_Model_Tenancy_Act_English.pdf"
+    },
+    {
+      "id": "mta-2021-s9-1",
+      "act_id": "mta-2021",
+      "section": "9(1)",
+      "jurisdiction": "national",
+      "text": "The rent payable under a tenancy agreement shall be such as may be agreed upon between the landowner and the tenant.",
+      "plain_summary": "Initial rent is set by mutual agreement.",
+      "topics": ["rent"],
+      "effective_from": "2021-06-02",
+      "last_verified": "2026-05-04"
+    },
+    {
+      "id": "mta-2021-s9-2",
+      "act_id": "mta-2021",
+      "section": "9(2)",
+      "jurisdiction": "national",
+      "text": "The landowner may revise the rent in accordance with the terms of the tenancy agreement, by giving a notice in writing of three months to the tenant before the revised rent becomes due.",
+      "plain_summary": "Rent can only be revised after at least 90 days' written notice to the tenant.",
+      "topics": ["rent", "rent_hike", "notice"],
+      "effective_from": "2021-06-02",
+      "last_verified": "2026-05-04"
+    },
+    {
+      "id": "mta-2021-s11-1",
+      "act_id": "mta-2021",
+      "section": "11(1)",
+      "jurisdiction": "national",
+      "text": "The security deposit to be paid by the tenant in advance shall be as agreed between the landowner and the tenant, subject to a maximum of two months' rent in case of residential premises and a maximum of six months' rent in case of non-residential premises.",
+      "plain_summary": "Residential security deposit is capped at 2 months' rent; commercial at 6 months' rent.",
+      "topics": ["security_deposit"],
+      "effective_from": "2021-06-02",
+      "last_verified": "2026-05-04"
+    },
+    {
+      "id": "mta-2021-s11-2",
+      "act_id": "mta-2021",
+      "section": "11(2)",
+      "jurisdiction": "national",
+      "text": "The security deposit shall be refunded to the tenant on the date of taking over vacant possession of the premises from the tenant, after making due deduction of any liability of the tenant.",
+      "plain_summary": "Security deposit is refundable when the tenant vacates, minus verified dues.",
+      "topics": ["security_deposit", "refund"],
+      "effective_from": "2021-06-02",
+      "last_verified": "2026-05-04"
+    },
+    {
+      "id": "mta-2021-s15-1",
+      "act_id": "mta-2021",
+      "section": "15(1)",
+      "jurisdiction": "national",
+      "text": "Unless otherwise agreed by the landowner and tenant in the tenancy agreement, the responsibility for repair and maintenance shall be as specified in the Schedule II.",
+      "plain_summary": "Default repair obligations follow Schedule II of the MTA: structural and major repairs are the landlord's; minor maintenance is the tenant's.",
+      "topics": ["repairs", "maintenance"],
+      "effective_from": "2021-06-02",
+      "last_verified": "2026-05-04"
+    },
+    {
+      "id": "mta-2021-s18",
+      "act_id": "mta-2021",
+      "section": "18",
+      "jurisdiction": "national",
+      "text": "The landowner or the property manager shall give a notice in writing of twenty-four hours to the tenant prior to entering the premises for the purpose of carrying out repairs or replacement.",
+      "plain_summary": "Landlord must give 24 hours' written notice before entering the premises.",
+      "topics": ["entry", "inspection", "privacy"],
+      "effective_from": "2021-06-02",
+      "last_verified": "2026-05-04"
+    },
+    {
+      "id": "mta-2021-s20",
+      "act_id": "mta-2021",
+      "section": "20",
+      "jurisdiction": "national",
+      "text": "No landowner or property manager shall withhold any essential supply to the premises occupied by the tenant.",
+      "plain_summary": "Landlord cannot cut off water, electricity, or essential services to the tenant.",
+      "topics": ["essential_services", "harassment"],
+      "effective_from": "2021-06-02",
+      "last_verified": "2026-05-04"
+    },
+    {
+      "id": "mta-2021-s21-1",
+      "act_id": "mta-2021",
+      "section": "21(1)",
+      "jurisdiction": "national",
+      "text": "A landowner may approach the Rent Authority for recovery of possession of the premises on one or more of the grounds specified in this section.",
+      "plain_summary": "Eviction must go through the Rent Authority on enumerated grounds; landlords cannot self-help evict.",
+      "topics": ["eviction", "due_process"],
+      "effective_from": "2021-06-02",
+      "last_verified": "2026-05-04"
+    },
+    {
+      "id": "reg-act-1908-s17",
+      "act_id": "reg-act-1908",
+      "act_name": "Registration Act, 1908",
+      "section": "17",
+      "jurisdiction": "national",
+      "text": "The following documents shall be registered ... (d) leases of immovable property from year to year, or for any term exceeding one year, or reserving a yearly rent.",
+      "plain_summary": "Any lease of more than one year (or year-to-year) must be registered.",
+      "topics": ["registration"],
+      "effective_from": "1908-01-01",
+      "last_verified": "2026-05-04"
+    },
+    {
+      "id": "ica-1872-s23",
+      "act_id": "ica-1872",
+      "act_name": "Indian Contract Act, 1872",
+      "section": "23",
+      "jurisdiction": "national",
+      "text": "The consideration or object of an agreement is lawful, unless ... it is opposed to public policy. ... Every agreement of which the object or consideration is unlawful is void.",
+      "plain_summary": "Contract terms that are opposed to public policy are void.",
+      "topics": ["voidability", "public_policy"],
+      "effective_from": "1872-09-01",
+      "last_verified": "2026-05-04"
+    },
+    {
+      "id": "ica-1872-s74",
+      "act_id": "ica-1872",
+      "section": "74",
+      "jurisdiction": "national",
+      "text": "When a contract has been broken, if a sum is named in the contract as the amount to be paid in case of such breach ... the party complaining of the breach is entitled, whether or not actual damage or loss is proved to have been caused thereby, to receive from the party who has broken the contract reasonable compensation not exceeding the amount so named.",
+      "plain_summary": "Penalties in contracts are limited to 'reasonable compensation', not punitive amounts.",
+      "topics": ["penalties", "late_fee", "damages"],
+      "effective_from": "1872-09-01",
+      "last_verified": "2026-05-04"
+    }
+  ]
+}

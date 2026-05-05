@@ -1,0 +1,130 @@
+{
+  "_meta": {
+    "description": "Curated catalog of common void / exploitative clauses found in Indian rental agreements, with the legal basis for why they're void and a compliant replacement. Used by the audit pipeline to detect known patterns and propose redlined fixes.",
+    "version": "0.1.0",
+    "last_updated": "2026-05-04",
+    "review_cadence_days": 90
+  },
+  "patterns": [
+    {
+      "id": "vc-deposit-over-2mo-residential",
+      "title": "Security deposit exceeds 2 months' rent (residential)",
+      "pattern_keywords": ["security deposit", "advance", "caution money", "months rent"],
+      "pattern_description": "Any clause that requires a residential tenant to pay a security deposit greater than 2 months of monthly rent.",
+      "why_void": "The Model Tenancy Act 2021, Section 11(1), caps residential security deposits at 2 months' rent. Anything above that is unenforceable in MTA-adopting states.",
+      "citation_ids": ["mta-2021-s11-1"],
+      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA"],
+      "severity": "high",
+      "replacement_clause": "The Tenant shall pay a refundable security deposit equivalent to two (2) months of the monthly rent, returnable within one (1) month of vacating the premises after deducting any verified outstanding dues.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-deposit-over-6mo-commercial",
+      "title": "Security deposit exceeds 6 months' rent (commercial)",
+      "pattern_keywords": ["security deposit", "commercial", "non-residential"],
+      "pattern_description": "Commercial lease requiring more than 6 months' rent as security.",
+      "why_void": "Model Tenancy Act 2021, Section 11(1), caps commercial security deposits at 6 months' rent.",
+      "citation_ids": ["mta-2021-s11-1"],
+      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA"],
+      "severity": "high",
+      "replacement_clause": "The Tenant shall pay a refundable security deposit equivalent to six (6) months of the monthly rent, returnable within one (1) month of vacating the premises after deducting any verified outstanding dues.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-deposit-non-refundable",
+      "title": "Security deposit declared non-refundable",
+      "pattern_keywords": ["non-refundable", "forfeited", "deposit", "shall not be returned"],
+      "pattern_description": "Clause stating the security deposit is non-refundable or forfeited under any circumstances.",
+      "why_void": "Security deposits are a custodial sum, not consideration. Forfeiting the entire deposit is an unconscionable bargain under the Indian Contract Act 1872, Section 23, and contrary to the refund obligation implied by MTA Section 11(2).",
+      "citation_ids": ["mta-2021-s11-2", "ica-1872-s23"],
+      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA", "MH", "GJ"],
+      "severity": "high",
+      "replacement_clause": "The security deposit is refundable to the Tenant within one (1) month of the Tenant vacating the premises, after lawful deduction of any verified outstanding rent, utility dues, or actual repair costs (excluding normal wear and tear).",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-rent-hike-no-notice",
+      "title": "Landlord may increase rent without notice or limit",
+      "pattern_keywords": ["increase rent", "revise rent", "without notice", "at landlord's discretion"],
+      "pattern_description": "Clause permitting unilateral rent increases without a written notice period or capped frequency.",
+      "why_void": "MTA-derived rules require at least 90 days' written notice of any rent increase, and rent may be revised only once in a 12-month period unless the agreement specifies an escalation clause with a defined formula.",
+      "citation_ids": ["mta-2021-s9-1", "mta-2021-s9-2"],
+      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA"],
+      "severity": "medium",
+      "replacement_clause": "Rent may be revised once every twelve (12) months. The Landlord shall provide the Tenant with written notice of any revision at least ninety (90) days prior to the revised rent taking effect.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-eviction-no-cause",
+      "title": "Landlord may evict tenant without cause",
+      "pattern_keywords": ["evict", "vacate immediately", "at landlord's sole discretion", "without reason"],
+      "pattern_description": "Clause permitting the landlord to evict the tenant without cause or due process.",
+      "why_void": "Under MTA Section 21, eviction must be sought through the Rent Authority and only on enumerated grounds. Self-help eviction or eviction without notice and cause is not permitted.",
+      "citation_ids": ["mta-2021-s21-1", "mta-2021-s21-2"],
+      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA"],
+      "severity": "high",
+      "replacement_clause": "The Landlord may seek eviction of the Tenant only through the designated Rent Authority and only on grounds enumerated in the applicable state tenancy law, including non-payment of rent for two consecutive months, material breach, or unauthorised use.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-no-essential-services",
+      "title": "Landlord may cut off essential services",
+      "pattern_keywords": ["water", "electricity", "essential services", "disconnect", "cut off"],
+      "pattern_description": "Clause permitting landlord to disconnect water, electricity, or essential supplies as a means of enforcing rent collection or vacation.",
+      "why_void": "MTA Section 20 prohibits landlords from withholding essential services. Doing so creates a cause of action for the tenant.",
+      "citation_ids": ["mta-2021-s20"],
+      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA"],
+      "severity": "high",
+      "replacement_clause": "The Landlord shall not withhold or disconnect any essential supply or service (including water and electricity) to the premises during the tenancy.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-blanket-repair-on-tenant",
+      "title": "All repairs at tenant's cost",
+      "pattern_keywords": ["all repairs", "structural", "maintenance", "at tenant's cost"],
+      "pattern_description": "Clause requiring the tenant to bear all repair costs, including structural repairs.",
+      "why_void": "MTA Section 15 allocates structural and major repairs to the landlord. Day-to-day maintenance may be allocated to the tenant. A blanket transfer of all repair obligations to the tenant is unenforceable.",
+      "citation_ids": ["mta-2021-s15-1", "mta-2021-s15-2"],
+      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA"],
+      "severity": "medium",
+      "replacement_clause": "The Landlord shall be responsible for structural repairs and major maintenance (roof, walls, plumbing, wiring). The Tenant shall be responsible for day-to-day minor maintenance such as fuses, taps, drains, and consumables.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-no-registration",
+      "title": "Agreement not registered or stamp-duty avoided",
+      "pattern_keywords": ["unregistered", "11 months", "no stamp duty"],
+      "pattern_description": "Tenancy term equal to or exceeding 12 months without provision for digital registration with the Rent Authority within 60 days, or no stamp duty paid.",
+      "why_void": "Under the New Rent Rules 2026 and Registration Act 1908 Section 17, a written tenancy agreement must be digitally stamped and registered with the designated Rent Authority within 60 days of signing. Failure attracts a ₹5,000+ penalty (state-dependent) and may render the agreement inadmissible as evidence.",
+      "citation_ids": ["reg-act-1908-s17", "mta-2021-s4-2"],
+      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA", "MH", "GJ"],
+      "severity": "high",
+      "replacement_clause": "Both parties agree to digitally stamp and register this agreement with the designated Rent Authority within sixty (60) days of execution. The cost of stamp duty and registration shall be shared equally unless otherwise agreed in writing.",
+      "perspective": "both"
+    },
+    {
+      "id": "vc-late-fee-excessive",
+      "title": "Excessive late-payment penalty",
+      "pattern_keywords": ["late fee", "penalty", "per day", "compound interest"],
+      "pattern_description": "Late-payment charges that are punitive (e.g., compound interest, daily fees exceeding 2%/month).",
+      "why_void": "Indian Contract Act 1872, Section 74, only permits 'reasonable compensation' for breach. Punitive penalties beyond actual loss are not enforceable. Courts have generally treated 18-24% p.a. simple interest as the upper bound for late-rent fees.",
+      "citation_ids": ["ica-1872-s74"],
+      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA", "MH", "GJ"],
+      "severity": "medium",
+      "replacement_clause": "If rent is not paid within seven (7) days of the due date, the Tenant shall pay simple interest at 1.5% per month (18% per annum) on the unpaid amount until paid in full.",
+      "perspective": "tenant"
+    },
+    {
+      "id": "vc-blanket-inspection-anytime",
+      "title": "Landlord may enter premises any time",
+      "pattern_keywords": ["enter premises", "inspection", "at any time", "without notice"],
+      "pattern_description": "Clause allowing the landlord to enter the premises at any time without notice.",
+      "why_void": "MTA Section 18 requires the landlord to give the tenant at least 24 hours' written notice before entering, except in emergencies (fire, structural collapse, etc.).",
+      "citation_ids": ["mta-2021-s18"],
+      "jurisdictions": ["national", "TN", "AP", "UP", "AS", "KA"],
+      "severity": "medium",
+      "replacement_clause": "The Landlord may enter the premises only after giving the Tenant at least twenty-four (24) hours' prior written notice, and only at reasonable hours, except in case of emergency (fire, flood, structural risk).",
+      "perspective": "tenant"
+    }
+  ]
+}
