@@ -42,7 +42,7 @@ This document describes what is currently protected, what is intentionally not, 
 
 ## Reporting a vulnerability
 
-Email [your email] with the subject "RentSafe Security". Include reproduction steps and the impact you observed. Public disclosure is appreciated only after a fix has shipped.
+Email pdarsh907@gmail.com with the subject "RentSafe Security". Include reproduction steps and the impact you observed. Public disclosure is appreciated only after a fix has shipped.
 
 ## Security checklist (last reviewed)
 

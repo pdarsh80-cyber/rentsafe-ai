@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Generate a Rental Agreement · RentSafe AI</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8fafc;color:#1f2937;line-height:1.6;overflow-x:hidden}
+.hero{background:linear-gradient(135deg,#0f1a2e,#1a3050);color:#fff;padding:32px 16px 60px;text-align:center}
+.logo{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:6px}
+.logo-icon{width:38px;height:38px;background:#f59e0b;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-text{font-size:20px;font-weight:800}.logo-text span{color:#f59e0b}
+.hero h1{font-size:clamp(20px,5vw,32px);font-weight:800;line-height:1.25;margin:14px 0 8px}
+.hero h1 span{color:#f59e0b}
+.hero p{font-size:13px;color:#94a3b8;max-width:520px;margin:0 auto 14px}
+.back{display:inline-block;font-size:12px;color:#94a3b8;margin-bottom:14px;text-decoration:none}
+.back:hover{color:#fff}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px}
+.card{background:#fff;border-radius:16px;box-shadow:0 4px 28px rgba(0,0,0,.1);margin-top:-36px;position:relative;z-index:10;padding:22px 18px}
+h2{font-size:14px;font-weight:700;color:#0f1a2e;margin:18px 0 10px;text-transform:uppercase;letter-spacing:.6px}
+h2:first-child{margin-top:4px}
+.row{display:grid;grid-template-columns:1fr;gap:11px;margin-bottom:8px}
+@media(min-width:560px){.row.two{grid-template-columns:1fr 1fr}}
+label{display:block;font-size:12px;font-weight:600;color:#374151;margin-bottom:5px}
+input[type=text],input[type=number],input[type=date],select,textarea{
+  width:100%;padding:10px 12px;border:2px solid #e5e7eb;border-radius:9px;font-size:14px;font-family:inherit;background:#f9fafb;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#f59e0b;background:#fff}
+textarea{min-height:80px;resize:vertical}
+.checkrow{display:flex;align-items:center;gap:10px;font-size:13px;color:#374151}
+.checkrow input{width:auto}
+.hint{font-size:11px;color:#6b7280;margin-top:3px}
+.btn{width:100%;padding:14px;background:#f59e0b;color:#0f1a2e;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;min-height:52px;margin-top:12px}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.btn.secondary{background:#fff;color:#0f1a2e;border:2px solid #0f1a2e}
+.err{display:none;background:#fee2e2;border:1px solid #fecaca;border-radius:9px;padding:11px 13px;color:#991b1b;font-size:13px;margin-top:10px}
+.err.on{display:block}
+.ldr{display:none;text-align:center;padding:42px 16px}
+.ldr.on{display:block}
+.spin{width:42px;height:42px;border:4px solid #e5e7eb;border-top-color:#f59e0b;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.res{display:none;margin-top:18px}
+.res.on{display:block}
+.outhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;flex-wrap:wrap}
+.outhead h3{font-size:16px;font-weight:800;color:#0f1a2e}
+.warnbox{background:#fef3c7;border:1px solid #fde68a;border-radius:9px;padding:11px 13px;font-size:12.5px;color:#92400e;margin-bottom:11px}
+.warnbox b{display:block;margin-bottom:3px}
+.notesbox{background:#eef2ff;border:1px solid #c7d2fe;border-radius:9px;padding:11px 13px;font-size:12.5px;color:#3730a3;margin-bottom:11px}
+.docout{width:100%;min-height:380px;padding:14px;border:1px solid #e5e7eb;border-radius:9px;font-family:'Cambria','Times New Roman',serif;font-size:13.5px;line-height:1.7;background:#fff;white-space:pre-wrap}
+.outbtns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:11px}
+@media(max-width:520px){.outbtns{grid-template-columns:1fr}}
+.outbtns button{padding:11px;border-radius:9px;border:none;font-size:13px;font-weight:700;cursor:pointer}
+.b1{background:#0f1a2e;color:#fff}.b2{background:#f3f4f6;color:#1f2937;border:1.5px solid #e5e7eb !important}.b3{background:#22c55e;color:#fff}
+footer{background:#0f1a2e;color:#94a3b8;padding:24px 16px;text-align:center;font-size:11px;margin-top:32px}
+.disc{font-size:11px;color:#fbbf24;margin-top:6px}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <a href="/" class="back">← Back to audit</a>
+  <div class="logo"><div class="logo-icon">🛡️</div><div class="logo-text">Rent<span>Safe</span> AI</div></div>
+  <h1>Generate a <span>Compliant</span> Rental Agreement</h1>
+  <p>Answer a few questions. We draft an agreement that complies with your state's tenancy law (MTA 2021, ICA 1872, 2026 Rent Rules) and avoids 30 known void clauses. — No more illegal templates.</p>
+</div>
+
+<div class="wrap">
+  <div class="card" id="formcard">
+    <h2>Property &amp; State</h2>
+    <div class="row two">
+      <div>
+        <label>Property type *</label>
+        <select id="propertyType">
+          <option value="residential">Residential</option>
+          <option value="commercial">Commercial / Non-residential</option>
+        </select>
+      </div>
+      <div>
+        <label>State *</label>
+        <select id="state">
+          <option value="">-- Select state --</option>
+          <option>Andhra Pradesh</option><option>Assam</option><option>Bihar</option>
+          <option>Chhattisgarh</option><option>Delhi</option><option>Goa</option>
+          <option>Gujarat</option><option>Haryana</option><option>Himachal Pradesh</option>
+          <option>Jharkhand</option><option>Karnataka</option><option>Kerala</option>
+          <option>Madhya Pradesh</option><option>Maharashtra</option><option>Odisha</option>
+          <option>Punjab</option><option>Rajasthan</option><option>Tamil Nadu</option>
+          <option>Telangana</option><option>Uttar Pradesh</option><option>Uttarakhand</option>
+          <option>West Bengal</option>
+        </select>
+      </div>
+    </div>
+
+    <h2>Landlord</h2>
+    <div class="row two">
+      <div><label>Landlord full name *</label><input type="text" id="landlordName" placeholder="e.g., Mr. Rakesh Patel"></div>
+      <div><label>Landlord address *</label><input type="text" id="landlordAddress" placeholder="Address line"></div>
+    </div>
+
+    <h2>Tenant</h2>
+    <div class="row two">
+      <div><label>Tenant full name *</label><input type="text" id="tenantName" placeholder="e.g., Ms. Priya Shah"></div>
+      <div><label>Tenant current address *</label><input type="text" id="tenantAddress" placeholder="Address line"></div>
+    </div>
+
+    <h2>Property Being Rented</h2>
+    <div class="row">
+      <div><label>Property address *</label><input type="text" id="propertyAddress" placeholder="Full address with PIN"></div>
+    </div>
+    <div class="row">
+      <div>
+        <label>Property description</label>
+        <input type="text" id="propertyDescription" placeholder="e.g., 2BHK furnished apartment, 950 sqft, 2nd floor">
+      </div>
+    </div>
+
+    <h2>Financial Terms</h2>
+    <div class="row two">
+      <div>
+        <label>Monthly rent (Rs.) *</label>
+        <input type="number" id="rent" placeholder="25000" min="1">
+      </div>
+      <div>
+        <label>Security deposit (Rs.)</label>
+        <input type="number" id="deposit" placeholder="50000" min="0">
+        <div class="hint">Cap: 2 months rent (residential) / 6 months (commercial). Higher amounts will be capped automatically.</div>
+      </div>
+    </div>
+    <div class="row two">
+      <div>
+        <label>Term (months) *</label>
+        <input type="number" id="termMonths" placeholder="11" min="1" max="60">
+      </div>
+      <div>
+        <label>Start date</label>
+        <input type="date" id="startDate">
+      </div>
+    </div>
+    <div class="row two">
+      <div>
+        <label>Notice period (months)</label>
+        <input type="number" id="noticeMonths" placeholder="1" value="1" min="1" max="3">
+        <div class="hint">MTA §22 standard: 1 month from either party.</div>
+      </div>
+      <div>
+        <label>Annual rent escalation (%)</label>
+        <input type="number" id="escalationPercent" placeholder="0" value="0" min="0" max="20">
+        <div class="hint">Optional. 0 = no escalation. Common: 5–10%.</div>
+      </div>
+    </div>
+
+    <h2>Other Terms</h2>
+    <div class="row">
+      <div>
+        <label>Utilities included in rent</label>
+        <input type="text" id="utilities" placeholder="e.g., none / water + maintenance / all utilities">
+      </div>
+    </div>
+    <div class="checkrow" style="margin:10px 0">
+      <input type="checkbox" id="petsAllowed">
+      <label for="petsAllowed" style="margin:0">Tenant may keep pets</label>
+    </div>
+    <div class="checkrow" style="margin:10px 0">
+      <input type="checkbox" id="sublettingAllowed">
+      <label for="sublettingAllowed" style="margin:0">Sub-letting allowed (with landlord's consent)</label>
+    </div>
+    <div class="row">
+      <div>
+        <label>Special clauses (optional, free text)</label>
+        <textarea id="specialClauses" placeholder="Anything else? Furniture inventory, parking allocation, society rules, etc."></textarea>
+        <div class="hint">We will only include clauses that comply with applicable law. Anything unenforceable will be silently dropped or rewritten.</div>
+      </div>
+    </div>
+
+    <button class="btn" id="genbtn">✨ Generate Compliant Agreement</button>
+    <div class="err" id="err"></div>
+  </div>
+
+  <div class="ldr" id="ldr">
+    <div class="spin"></div>
+    <h3 style="font-size:15px">Drafting your agreement…</h3>
+    <p style="font-size:12px;color:#6b7280;margin-top:5px">Cross-checking against state-specific tenancy law and 30 void-clause patterns.</p>
+  </div>
+
+  <div class="res" id="res">
+    <div class="card">
+      <div class="outhead">
+        <h3>✅ Your draft agreement</h3>
+      </div>
+      <div id="warnings"></div>
+      <div id="notes"></div>
+      <textarea class="docout" id="docout" spellcheck="false"></textarea>
+      <div class="outbtns">
+        <button class="b1" id="copybtn">📋 Copy text</button>
+        <button class="b3" id="dlpdfbtn">⬇️ Download PDF</button>
+        <button class="b2" id="restartbtn">← Start over</button>
+      </div>
+      <p class="disc" style="margin-top:10px">⚠ This is informational. Have a lawyer review before signing. Both parties must register the final version with the Rent Authority within 60 days.</p>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p>© 2026 RentSafe AI · Vadodara, Gujarat · Generated agreements are informational, not legal advice.</p>
+</footer>
+
+<script>
+function $(id){return document.getElementById(id);}
+function showErr(m){var e=$('err');e.textContent='⚠ '+m;e.classList.add('on');}
+function hideErr(){$('err').classList.remove('on');}
+function setLdr(on){
+  $('formcard').style.display=on?'none':'block';
+  $('ldr').classList.toggle('on',on);
+}
+
+$('genbtn').addEventListener('click',async function(){
+  hideErr();
+  var state=$('state').value;
+  var landlordName=$('landlordName').value.trim();
+  var tenantName=$('tenantName').value.trim();
+  var propertyAddress=$('propertyAddress').value.trim();
+  var rent=parseFloat($('rent').value);
+  var termMonths=parseFloat($('termMonths').value);
+  if(!state){showErr('Please select your state.');return;}
+  if(!landlordName){showErr('Landlord name is required.');return;}
+  if(!tenantName){showErr('Tenant name is required.');return;}
+  if(!propertyAddress){showErr('Property address is required.');return;}
+  if(!rent||rent<=0){showErr('Monthly rent must be greater than zero.');return;}
+  if(!termMonths||termMonths<=0){showErr('Term in months is required.');return;}
+
+  setLdr(true);
+  try{
+    var body={
+      state:state,
+      propertyType:$('propertyType').value,
+      landlordName:landlordName,
+      landlordAddress:$('landlordAddress').value.trim(),
+      tenantName:tenantName,
+      tenantAddress:$('tenantAddress').value.trim(),
+      propertyAddress:propertyAddress,
+      propertyDescription:$('propertyDescription').value.trim(),
+      rent:rent,
+      deposit:parseFloat($('deposit').value)||0,
+      termMonths:termMonths,
+      startDate:$('startDate').value,
+      noticeMonths:parseFloat($('noticeMonths').value)||1,
+      escalationPercent:parseFloat($('escalationPercent').value)||0,
+      utilities:$('utilities').value.trim(),
+      petsAllowed:$('petsAllowed').checked,
+      sublettingAllowed:$('sublettingAllowed').checked,
+      specialClauses:$('specialClauses').value.trim()
+    };
+    var r=await fetch('/api/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    var d=await r.json();
+    if(d.error){throw new Error(d.error.message||'Generation failed.');}
+    setLdr(false);
+    renderResult(d);
+  }catch(e){
+    setLdr(false);$('formcard').style.display='block';
+    showErr('Generation failed: '+e.message);
+  }
+});
+
+function renderResult(d){
+  $('docout').value=d.agreement||'';
+  var w=$('warnings');w.innerHTML='';
+  if(d.warnings&&d.warnings.length){
+    var html='<div class="warnbox"><b>⚠ The generator slipped on '+d.warnings.length+' point'+(d.warnings.length!==1?'s':'')+':</b>';
+    for(var i=0;i<d.warnings.length;i++){
+      html+='<div>• '+escape(d.warnings[i].title)+' (severity: '+d.warnings[i].severity+')</div>';
+    }
+    html+='<div style="margin-top:6px;font-size:11.5px;opacity:.85">Edit the text above to remove these before signing.</div></div>';
+    w.innerHTML=html;
+  }
+  var n=$('notes');n.innerHTML='';
+  if(d.notes&&d.notes.length){
+    var html2='<div class="notesbox"><b>Notes about your inputs:</b>';
+    for(var j=0;j<d.notes.length;j++)html2+='<div>• '+escape(d.notes[j])+'</div>';
+    html2+='</div>';
+    n.innerHTML=html2;
+  }
+  if(d.capped_fields&&Object.keys(d.capped_fields).length){
+    var html3='<div class="warnbox"><b>Some inputs were capped to comply with the law:</b>';
+    for(var k in d.capped_fields)html3+='<div>• '+k+': '+escape(String(d.capped_fields[k]))+'</div>';
+    html3+='</div>';
+    n.innerHTML+=html3;
+  }
+  $('res').classList.add('on');
+  $('res').scrollIntoView({behavior:'smooth'});
+}
+
+function escape(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+$('copybtn').addEventListener('click',function(){
+  var txt=$('docout').value;
+  navigator.clipboard.writeText(txt).then(function(){
+    var b=$('copybtn');b.textContent='✓ Copied';setTimeout(function(){b.textContent='📋 Copy text';},1800);
+  });
+});
+
+$('dlpdfbtn').addEventListener('click',function(){
+  var txt=$('docout').value;
+  if(!txt){return;}
+  if(!window.jspdf||!window.jspdf.jsPDF){alert('PDF library still loading.');return;}
+  var jsPDF=window.jspdf.jsPDF;
+  var pdf=new jsPDF({unit:'pt',format:'a4'});
+  var W=pdf.internal.pageSize.getWidth(),H=pdf.internal.pageSize.getHeight();
+  var L=54,R=W-54,T=70,B=H-60;
+  pdf.setFont('times','bold');pdf.setFontSize(16);pdf.text('RENTAL AGREEMENT',W/2,T-20,{align:'center'});
+  pdf.setFont('times','normal');pdf.setFontSize(11);
+  var lines=pdf.splitTextToSize(txt,R-L);
+  var y=T+10;
+  for(var i=0;i<lines.length;i++){
+    if(y>B){pdf.addPage();y=T;}
+    pdf.text(lines[i],L,y);y+=15;
+  }
+  var stamp=new Date().toISOString().slice(0,10);
+  pdf.save('Rental-Agreement-'+stamp+'.pdf');
+});
+
+$('restartbtn').addEventListener('click',function(){
+  $('res').classList.remove('on');
+  $('formcard').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+</script>
+</body>
+</html>

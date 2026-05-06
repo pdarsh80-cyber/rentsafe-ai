@@ -1,6 +1,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <script>
 if (typeof pdfjsLib !== 'undefined') {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -205,19 +206,20 @@ footer p{font-size:11.5px;line-height:1.7;max-width:520px;margin:0 auto 5px}
   <h1>Unlock Instant Legal Clarity<br><span>for Your Rental Agreement.</span><br>Protect Your Future.</h1>
   <p>Instant AI audit of your rental agreement — every issue cited to the exact Indian law it violates.</p>
   <div class="badges"><span class="badge am">✓ 2 Free Audits</span><span class="badge">⚡ 30 seconds</span><span class="badge">📜 2026 Rent Rules</span><span class="badge">🇮🇳 India</span></div>
+  <div style="margin-top:18px"><a href="/generate.html" style="display:inline-block;background:rgba(245,158,11,.18);border:1px solid rgba(245,158,11,.45);color:#fcd34d;padding:9px 18px;border-radius:22px;font-size:12.5px;font-weight:700;text-decoration:none">✨ NEW: Generate a compliant agreement from scratch →</a></div>
 </div>
 
 <div class="wrap">
   <div class="icard" id="maincard">
-    <div class="tabs"><button class="tab on" id="t1">📋 Paste Text</button><button class="tab" id="t2">📄 Upload PDF</button></div>
+    <div class="tabs"><button class="tab on" id="t1">📋 Paste Text</button><button class="tab" id="t2">📄 Upload File</button></div>
     <div class="ibody" id="ibody">
       <div class="trust-sig">🔒 End-to-end encrypted. Your documents are private and never stored.</div>
       <div class="audit-counter" id="auditCounter"><span id="auditCounterText">✅ 2 free audits remaining</span><span id="auditCounterSub">No credit card needed</span></div>
       <div class="pnl on" id="pp"><textarea id="txt" placeholder="Paste your rental agreement here…"></textarea></div>
       <div class="pnl" id="pu">
         <div class="dz" id="dz">
-          <div class="dz-inner"><div style="font-size:32px">📁</div><h3>Tap to upload PDF</h3><p>PDF up to 20MB · scanned PDFs supported</p></div>
-          <input class="fi" type="file" id="fi" accept=".pdf">
+          <div class="dz-inner"><div style="font-size:32px">📁</div><h3>Tap to upload PDF or Word doc</h3><p>PDF or DOCX up to 20MB · scanned PDFs supported</p></div>
+          <input class="fi" type="file" id="fi" accept=".pdf,.docx">
         </div>
         <div class="fsel" id="fsel"><span style="font-size:20px">📄</span><span class="fname" id="fn"></span><button class="frm" id="frmbtn">✕</button></div>
       </div>
@@ -276,7 +278,23 @@ document.getElementById('t1').addEventListener('click',function(){switchTab('pas
 document.getElementById('t2').addEventListener('click',function(){switchTab('upload');});
 function switchTab(t){curTab=t;document.getElementById('t1').classList.toggle('on',t==='paste');document.getElementById('t2').classList.toggle('on',t==='upload');document.getElementById('pp').classList.toggle('on',t==='paste');document.getElementById('pu').classList.toggle('on',t==='upload');}
 
-// ── PDF EXTRACTION (frontend) ──
+// ── FILE EXTRACTION (frontend) ──
+// Handles both PDF and DOCX. Dispatches by file extension/type.
+async function extractTextFromFile(file){
+  var name=(file.name||'').toLowerCase();
+  if(name.endsWith('.docx')||file.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document'){
+    return await extractTextFromDOCX(file);
+  }
+  return await extractTextFromPDF(file);
+}
+async function extractTextFromDOCX(file){
+  if(typeof mammoth==='undefined')throw new Error('Word document support is loading — please retry in a second.');
+  var arrayBuffer=await file.arrayBuffer();
+  var result=await mammoth.extractRawText({arrayBuffer:arrayBuffer});
+  var text=(result&&result.value)||'';
+  if(text.trim().length<50)throw new Error('Could not extract enough text from the Word document. Try Save As PDF and re-upload.');
+  return text;
+}
 async function extractTextFromPDF(file){
   var arrayBuffer=await file.arrayBuffer();
   var pdf=await pdfjsLib.getDocument({data:arrayBuffer}).promise;
@@ -309,11 +327,11 @@ async function runOCR(file){
 
 fi.addEventListener('change',async function(){
   var file=fi.files&&fi.files[0];if(!file)return;
-  if(file.size>20*1024*1024){showErr('PDF too large. Max 20MB.');fi.value='';return;}
+  if(file.size>20*1024*1024){showErr('File too large. Max 20MB.');fi.value='';return;}
   document.getElementById('fn').textContent=file.name+' (extracting...)';
   fsel.style.display='flex';dz.style.display='none';
   try{
-    pdfText=await extractTextFromPDF(file);
+    pdfText=await extractTextFromFile(file);
     if(!pdfText||pdfText.trim().length<50){
       showErr('Could not extract enough text. Try pasting manually.');
       pdfText=null;fsel.style.display='none';dz.style.display='block';fi.value='';return;
@@ -330,9 +348,11 @@ dz.addEventListener('dragover',function(e){e.preventDefault();dz.style.borderCol
 dz.addEventListener('dragleave',function(){dz.style.borderColor='#d1d5db';dz.style.background='#f9fafb';});
 dz.addEventListener('drop',function(e){
   e.preventDefault();dz.style.borderColor='#d1d5db';dz.style.background='#f9fafb';
-  if(e.dataTransfer.files[0]&&e.dataTransfer.files[0].type==='application/pdf'){
-    fi.files=e.dataTransfer.files;fi.dispatchEvent(new Event('change'));
-  }
+  var f=e.dataTransfer.files&&e.dataTransfer.files[0];if(!f)return;
+  var n=(f.name||'').toLowerCase();
+  var ok=f.type==='application/pdf'||n.endsWith('.pdf')||n.endsWith('.docx')||
+         f.type==='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+  if(ok){fi.files=e.dataTransfer.files;fi.dispatchEvent(new Event('change'));}
 });
 document.getElementById('frmbtn').addEventListener('click',function(){pdfText=null;fsel.style.display='none';dz.style.display='block';fi.value='';});
 
