@@ -5,13 +5,15 @@
 // The underscore-prefixed folder is ignored by Vercel's routing (so this file
 // is bundled with functions that require it but is not exposed as an endpoint).
 
-const statutesData = require('../../data/statutes.seed.json');
-const voidClausesData = require('../../data/void-clauses.json');
+// Corpus files live INSIDE api/_lib/data/ (not /data/ at the project root).
+// This is intentional: files inside api/ are not served as static assets by
+// Vercel, so the corpus cannot be downloaded directly from a public URL.
+const statutesData = require('./data/statutes.seed.json');
+const voidClausesData = require('./data/void-clauses.json');
 
 const STATUTES = Array.isArray(statutesData.statutes) ? statutesData.statutes : [];
 const VOID_PATTERNS = Array.isArray(voidClausesData.patterns) ? voidClausesData.patterns : [];
 
-// Map common state input forms to the 2-letter codes used in jurisdictions[].
 const STATE_MAP = {
   'tamil nadu': 'TN', 'tn': 'TN',
   'andhra pradesh': 'AP', 'ap': 'AP',
@@ -41,7 +43,6 @@ function normalizeState(state) {
   if (!state) return null;
   const s = String(state).trim().toLowerCase();
   if (STATE_MAP[s]) return STATE_MAP[s];
-  // If the user passed a 2-letter code we don't know, just uppercase it.
   if (s.length === 2) return s.toUpperCase();
   return null;
 }
@@ -71,9 +72,8 @@ function findPatternById(id) {
   return VOID_PATTERNS.find(p => p.id === id) || null;
 }
 
-// Lightweight keyword/topic search — no embeddings yet. Good enough for v1
-// while the corpus is small (<200 chunks). Upgrade to vector search later.
-function searchStatutes(query, state, limit = 5) {
+function searchStatutes(query, state, limit) {
+  if (!Number.isFinite(limit)) limit = 5;
   const q = String(query || '').toLowerCase();
   const candidates = getRelevantStatutes(state);
   const queryWords = new Set(
@@ -85,16 +85,13 @@ function searchStatutes(query, state, limit = 5) {
       (s.plain_summary || '') + ' ' +
       (s.topics || []).join(' ')
     ).toLowerCase();
-
     let score = 0;
-    // Heavy weight on topic matches.
     (s.topics || []).forEach(t => {
       const norm = t.replace(/_/g, ' ');
       if (q.includes(norm)) score += 4;
     });
-    // Light weight on individual word overlap.
     queryWords.forEach(w => { if (text.includes(w)) score += 1; });
-    return { statute: s, score };
+    return { statute: s, score: score };
   });
   return scored
     .filter(x => x.score > 0)
@@ -113,13 +110,13 @@ function searchPatterns(query, state) {
 }
 
 module.exports = {
-  STATUTES,
-  VOID_PATTERNS,
-  normalizeState,
-  getRelevantStatutes,
-  getRelevantPatterns,
-  findStatuteById,
-  findPatternById,
-  searchStatutes,
-  searchPatterns
+  STATUTES: STATUTES,
+  VOID_PATTERNS: VOID_PATTERNS,
+  normalizeState: normalizeState,
+  getRelevantStatutes: getRelevantStatutes,
+  getRelevantPatterns: getRelevantPatterns,
+  findStatuteById: findStatuteById,
+  findPatternById: findPatternById,
+  searchStatutes: searchStatutes,
+  searchPatterns: searchPatterns
 };

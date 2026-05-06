@@ -10,14 +10,29 @@
 //   }
 
 const corpus = require('./_lib/corpus');
+const { checkRetrieveLimits } = require('./_lib/ratelimit');
+const { sanitizeClause } = require('./_lib/sanitize');
+const { applyCors, preflight } = require('./_lib/cors');
 
 module.exports = async function handler(req, res) {
+  if (preflight(req, res)) return;
+  const cors = applyCors(req, res);
+  if (!cors.sameOrigin) {
+    return res.status(403).json({ error: { message: 'Cross-origin requests are not allowed.' } });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: { message: 'Method not allowed' } });
   }
 
+  const rl = checkRetrieveLimits(req);
+  if (!rl.allowed) {
+    res.setHeader('Retry-After', String(rl.retryAfterSec));
+    return res.status(429).json({ error: { message: 'Too many requests. Slow down.' } });
+  }
+
   const body = req.body || {};
-  const clause = body.clause;
+  const clause = sanitizeClause(body.clause);
   const state = body.state;
   const limit = Number.isFinite(body.limit) ? Math.min(Math.max(body.limit, 1), 20) : 5;
 
