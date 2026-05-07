@@ -188,14 +188,14 @@ footer p{font-size:11.5px;line-height:1.7;max-width:520px;margin:0 auto 5px}
 <div class="overlay" id="paywallModal">
   <div class="mbox">
     <div class="mhandle"></div>
-    <h3>🔒 Free Audits Used Up</h3>
-    <p class="msub">You've used your 2 free audits. Choose a plan to continue.</p>
+    <h3>🔒 Free Audit Used</h3>
+    <p class="msub">You've used your free audit. Subscribe to keep auditing — or generate a compliant agreement instead.</p>
     <div class="pw-plans">
-      <div class="pw-plan pay"><div class="pw-plan-badge">PAY PER USE</div><div class="pw-price">₹99 <span>/ audit</span></div><h4>Single Audit</h4><p>One-time payment.</p></div>
-      <div class="pw-plan sub"><div class="pw-plan-badge">BEST VALUE ⭐</div><div class="pw-price">₹199 <span>/ month</span></div><h4>Unlimited Audits</h4><p>All future features.</p></div>
+      <div class="pw-plan sub"><div class="pw-plan-badge">BEST VALUE ⭐</div><div class="pw-price">₹199 <span>/ month</span></div><h4>Unlimited Audits</h4><p>+ 1 free generation per month</p></div>
+      <div class="pw-plan pay"><div class="pw-plan-badge">ONE-TIME</div><div class="pw-price">₹299 <span>/ agreement</span></div><h4>Generate Agreement</h4><p>State-compliant draft, instant.</p></div>
     </div>
-    <button class="pw-btn pay" onclick="handlePayment('single')">Continue with ₹99 per audit</button>
-    <button class="pw-btn sub" onclick="handlePayment('monthly')">Upgrade to ₹199/month Unlimited</button>
+    <button class="pw-btn sub" onclick="handlePayment('monthly')">Subscribe at ₹199/month</button>
+    <button class="pw-btn pay" onclick="window.location.href='/generate.html'">Generate one agreement (₹299) →</button>
     <button class="pw-dismiss" onclick="document.getElementById('paywallModal').classList.remove('on')">Maybe later</button>
   </div>
 </div>
@@ -205,7 +205,7 @@ footer p{font-size:11.5px;line-height:1.7;max-width:520px;margin:0 auto 5px}
   <div class="logo-tagline">Clarity. Compliance. Confidence.</div>
   <h1>Unlock Instant Legal Clarity<br><span>for Your Rental Agreement.</span><br>Protect Your Future.</h1>
   <p>Instant AI audit of your rental agreement — every issue cited to the exact Indian law it violates.</p>
-  <div class="badges"><span class="badge am">✓ 2 Free Audits</span><span class="badge">⚡ 30 seconds</span><span class="badge">📜 2026 Rent Rules</span><span class="badge">🇮🇳 India</span></div>
+  <div class="badges"><span class="badge am">✓ 1 Free Audit</span><span class="badge">⚡ 30 seconds</span><span class="badge">📜 2026 Rent Rules</span><span class="badge">🇮🇳 India</span></div>
   <div style="margin-top:18px"><a href="/generate.html" style="display:inline-block;background:rgba(245,158,11,.18);border:1px solid rgba(245,158,11,.45);color:#fcd34d;padding:9px 18px;border-radius:22px;font-size:12.5px;font-weight:700;text-decoration:none">✨ NEW: Generate a compliant agreement from scratch →</a></div>
 </div>
 
@@ -214,7 +214,7 @@ footer p{font-size:11.5px;line-height:1.7;max-width:520px;margin:0 auto 5px}
     <div class="tabs"><button class="tab on" id="t1">📋 Paste Text</button><button class="tab" id="t2">📄 Upload File</button></div>
     <div class="ibody" id="ibody">
       <div class="trust-sig">🔒 End-to-end encrypted. Your documents are private and never stored.</div>
-      <div class="audit-counter" id="auditCounter"><span id="auditCounterText">✅ 2 free audits remaining</span><span id="auditCounterSub">No credit card needed</span></div>
+      <div class="audit-counter" id="auditCounter"><span id="auditCounterText">✅ 1 free audit remaining</span><span id="auditCounterSub">No credit card needed</span></div>
       <div class="pnl on" id="pp"><textarea id="txt" placeholder="Paste your rental agreement here…"></textarea></div>
       <div class="pnl" id="pu">
         <div class="dz" id="dz">
@@ -253,7 +253,7 @@ footer p{font-size:11.5px;line-height:1.7;max-width:520px;margin:0 auto 5px}
 
 <script>
 var curTab='paste',pdfText=null,selState='',lastData=null;
-var FREE_LIMIT=2;
+var FREE_LIMIT=1;
 function getUsage(){try{return JSON.parse(localStorage.getItem('rentsafe_usage')||'{"count":0,"plan":"free"}')}catch(e){return{count:0,plan:'free'}}}
 function setUsage(u){localStorage.setItem('rentsafe_usage',JSON.stringify(u))}
 function canAudit(){var u=getUsage();return u.plan==='paid'||u.count<FREE_LIMIT}
@@ -263,7 +263,7 @@ function updateCounter(){
   if(u.plan==='paid'){el.textContent='⭐ Unlimited plan active';sub.textContent='';}
   else{var rem=Math.max(0,FREE_LIMIT-u.count);el.textContent=rem>0?'✅ '+rem+' free audit'+(rem!==1?'s':'')+' remaining':'🔒 Free audits used';sub.textContent=rem>0?'No credit card needed':'';}
 }
-function handlePayment(t){alert('💳 Payment coming soon!');var u=getUsage();u.count=Math.max(0,u.count-1);setUsage(u);document.getElementById('paywallModal').classList.remove('on');updateCounter();}
+function handlePayment(t){alert('💳 Payment integration coming soon. Free access continues during launch.');var u=getUsage();u.count=Math.max(0,u.count-1);setUsage(u);document.getElementById('paywallModal').classList.remove('on');updateCounter();}
 
 var modal=document.getElementById('modal'),stsel=document.getElementById('stsel'),mcbtn=document.getElementById('mcbtn');
 var ibody=document.getElementById('ibody'),ldr=document.getElementById('ldr'),res=document.getElementById('res');
