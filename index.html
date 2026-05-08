@@ -170,6 +170,51 @@ footer{background:#0f1a2e;color:#94a3b8;padding:28px 16px;text-align:center}
 footer p{font-size:11.5px;line-height:1.7;max-width:520px;margin:0 auto 5px}
 .disc{border-top:1px solid rgba(255,255,255,.1);padding-top:13px;margin-top:13px}
 @media(min-width:580px){.shbtns{flex-direction:row;flex-wrap:wrap}.sb{flex:1;min-width:110px;width:auto}.overlay{align-items:center;padding:20px}.mbox{border-radius:16px;max-width:420px}.mhandle{display:none}.sccard{flex-direction:row;align-items:center}.pw-plans{flex-direction:row}.pw-plan{flex:1}}
+/* ── MOBILE-FIRST POLISH (≤580px) ── */
+@media(max-width:580px){
+  /* Prevent iOS auto-zoom on input focus */
+  input,select,textarea{font-size:16px !important}
+  /* Tighter, taller-feeling hero */
+  .hero{padding:22px 14px 56px}
+  .hero h1{font-size:23px;line-height:1.22;margin-bottom:10px}
+  .hero p{font-size:12.5px;margin-bottom:18px}
+  .badges{gap:5px}.badge{font-size:10.5px;padding:3px 9px}
+  /* Card tighter */
+  .icard{margin-top:-32px;border-radius:14px}
+  .ibody{padding:16px 14px}
+  /* Bigger tap targets */
+  .tab{min-height:54px;font-size:13.5px}
+  .abtn{padding:16px;font-size:15px;min-height:56px}
+  .cite-tog{min-height:48px;padding:13px 12px;font-size:13px}
+  .fixcopy{min-height:40px;padding:9px 14px;font-size:12px}
+  .frm{min-width:40px;min-height:40px;font-size:20px}
+  /* Score card — readable but not cramped */
+  .sccard{padding:17px 15px;gap:12px}
+  .scnum{font-size:38px}
+  /* Findings — improve readability */
+  .fc{padding:13px 12px;border-radius:10px}
+  .ftit{font-size:14.5px;line-height:1.3}
+  .fexp{font-size:13.5px;line-height:1.6}
+  .cref,.imp{font-size:12px;line-height:1.5}
+  /* Citation card mobile tweaks */
+  .cite-card{margin-top:9px}
+  .cite-body{padding:10px 12px 11px;font-size:12.5px}
+  .cite-quote{font-size:11.5px;padding:8px 10px}
+  /* Suggested-fix card */
+  .fixcard{padding:12px}
+  .fixtxt{font-size:12.5px;padding:9px 10px}
+  /* Share buttons stack with comfy spacing */
+  .shbtns{flex-direction:column;gap:9px}
+  .sb{padding:14px;font-size:14px;min-height:52px}
+  /* Audit counter — smaller but readable */
+  .audit-counter{font-size:12px;padding:9px 12px}
+  /* Modal: full-bleed bottom sheet on mobile */
+  .mbox{padding:20px 18px 28px;border-radius:18px 18px 0 0;max-height:88vh}
+  .pw-plans{flex-direction:column;gap:9px}
+  .pw-plan{padding:14px}
+  /* Footer compact */
+  footer{padding:22px 14px}
+}
 </style>
 
 <div class="overlay" id="modal">
@@ -759,7 +804,7 @@ function generateReport(d){
   if(d.miss&&d.miss.length){
     sectionTitle('Missing Clauses');
     for(var mi=0;mi<d.miss.length;mi++){
-      var mLines=wrapText('•  '+d.miss[mi],10,'normal');
+      var mLines=wrapText('\u2022  '+d.miss[mi],10,'normal');
       var mh=mLines.length*13+6;
       addPageIfNeeded(mh);
       setColor(COLOR.red);pdf.setFont('helvetica','normal');pdf.setFontSize(10);
@@ -770,7 +815,7 @@ function generateReport(d){
   if(d.pos&&d.pos.length){
     sectionTitle('Done Right');
     for(var pi=0;pi<d.pos.length;pi++){
-      var pLines=wrapText('✓  '+d.pos[pi],10,'normal');
+      var pLines=wrapText('\u2713  '+d.pos[pi],10,'normal');
       var ph=pLines.length*13+6;
       addPageIfNeeded(ph);
       setColor(COLOR.green);pdf.setFont('helvetica','normal');pdf.setFontSize(10);
@@ -783,3 +828,5 @@ function generateReport(d){
   pdf.save('RentSafe-Audit-'+(d.state||'Report').replace(/\s+/g,'-')+'-'+stamp+'.pdf');
 }
 </script>
+</body>
+</html>
