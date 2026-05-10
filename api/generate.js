@@ -28,7 +28,7 @@ function buildSystemPrompt(state, propertyType) {
   }).join('\n');
 
   const avoidBlock = patterns.map(function(p){
-    return '[' + p.id + '] AVOID: ' + p.title + ' \u2014 ' + p.why_void;
+    return '[' + p.id + '] AVOID: ' + p.title;
   }).join('\n');
 
   return [
@@ -144,7 +144,9 @@ module.exports = async function handler(req, res) {
     if (!response.ok) {
       console.error('Groq HTTP error:', response.status, await response.text());
       rl.refundAudit(req);
-      return res.status(502).json({ error: { message: 'Generation service unavailable. Please retry — your free quota was not used.' } });
+      var friendly = 'Generation service unavailable. Please retry — your free quota was not used.';
+      if (response.status === 429) friendly = 'AI provider hit its free-tier rate limit. Please wait ~60 seconds and retry. Your quota was not used.';
+      return res.status(502).json({ error: { message: friendly, _provider_status: response.status } });
     }
     const data = await response.json();
     const content = data && data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : null;
