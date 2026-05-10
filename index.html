@@ -170,6 +170,19 @@ footer{background:#0f1a2e;color:#94a3b8;padding:28px 16px;text-align:center}
 footer p{font-size:11.5px;line-height:1.7;max-width:520px;margin:0 auto 5px}
 .disc{border-top:1px solid rgba(255,255,255,.1);padding-top:13px;margin-top:13px}
 @media(min-width:580px){.shbtns{flex-direction:row;flex-wrap:wrap}.sb{flex:1;min-width:110px;width:auto}.overlay{align-items:center;padding:20px}.mbox{border-radius:16px;max-width:420px}.mhandle{display:none}.sccard{flex-direction:row;align-items:center}.pw-plans{flex-direction:row}.pw-plan{flex:1}}
+/* ── HIGHLIGHTED AGREEMENT + TRUST STRIP + MARKET TAG ── */
+.trustbar{background:linear-gradient(135deg,#ecfdf5,#f0fdf4);border:1px solid #bbf7d0;border-radius:10px;padding:11px 13px;margin-bottom:13px;font-size:12.5px;color:#166534;line-height:1.55}
+.trustbar strong{color:#0f5132}
+.hlcard{background:#fff;border-radius:12px;padding:16px;margin-bottom:13px;box-shadow:0 2px 8px rgba(0,0,0,.05);border-left:4px solid #f59e0b}
+.hlcard h3{font-size:14px;font-weight:700;color:#0f1a2e;margin-bottom:5px}
+.hlcard .lbl{font-size:11.5px;color:#6b7280;margin-bottom:10px}
+.hlbox{background:#fafaf9;border:1px solid #e7e5e4;border-radius:9px;padding:13px 14px;font-family:Georgia,'Times New Roman',serif;font-size:13px;line-height:1.7;color:#1f2937;max-height:360px;overflow-y:auto;white-space:pre-wrap;word-wrap:break-word}
+.hlt{padding:1px 4px;border-radius:3px;font-weight:600}
+.hlt-h{background:#fee2e2;color:#991b1b;border-bottom:2px solid #ef4444}
+.hlt-m{background:#fef3c7;color:#92400e;border-bottom:2px solid #f59e0b}
+.hlt-l{background:#dcfce7;color:#166534;border-bottom:2px solid #22c55e}
+.hlhint{font-size:11px;color:#6b7280;margin-top:9px;text-align:center}
+.market-tag{display:inline-flex;align-items:center;gap:5px;background:#eef2ff;border:1px solid #c7d2fe;color:#3730a3;padding:4px 10px;border-radius:6px;font-size:11.5px;font-weight:600;margin-top:8px}
 /* ── MOBILE-FIRST POLISH (≤580px) ── */
 @media(max-width:580px){
   /* Prevent iOS auto-zoom on input focus */
@@ -435,12 +448,39 @@ async function runAudit(){
     lastData={state:selState,ts:new Date().toISOString(),score:score,or:result.overall_risk,oc:result.overall_confidence||80,
       rc:{h:result.findings.filter(function(f){return f.risk==='high';}).length,m:result.findings.filter(function(f){return f.risk==='medium';}).length,l:result.findings.filter(function(f){return f.risk==='low';}).length},
       findings:result.findings,actions:result.actions||[],miss:result.missing_clauses||[],pos:result.positive_clauses||[],sum:result.summary};
+    if(lastData)lastData.sourceText=txt;
     incrementUsage();updateCounter();setLdr(false);renderResults(lastData);
   }catch(e){
     setLdr(false);showErr('Analysis failed: '+e.message);console.error(e);
   }
 }
 
+function buildHighlightedAgreement(text,findings){
+  if(!text)return '';
+  // Sort by clause length desc so longer matches win when nested.
+  var sorted=(findings||[]).slice().sort(function(a,b){return ((b.clause_ref||'').length)-((a.clause_ref||'').length);});
+  // Tokenize: walk the original text, swap matched substrings with placeholder tokens, escape rest, then swap back to <mark> tags.
+  var work=text;
+  var tokens=[];
+  for(var i=0;i<sorted.length;i++){
+    var f=sorted[i];
+    if(!f.clause_ref)continue;
+    var quote=f.clause_ref.trim();
+    if(quote.length<6)continue;
+    var idx=work.indexOf(quote);
+    if(idx<0)continue;
+    var token='HL'+tokens.length+'';
+    tokens.push({quote:quote,risk:f.risk||'medium'});
+    work=work.slice(0,idx)+token+work.slice(idx+quote.length);
+  }
+  var safe=esc(work);
+  for(var t=0;t<tokens.length;t++){
+    var cls='hlt-'+(tokens[t].risk?tokens[t].risk[0]:'m');
+    var tk='HL'+t+'';
+    safe=safe.replace(tk,'<mark class="hlt '+cls+'">'+esc(tokens[t].quote)+'</mark>');
+  }
+  return safe.replace(/\n/g,'<br>');
+}
 function renderResults(d){
   var col=sColor(d.score),i,f,c,html='';
   var fHTML='',totalGrounded=0,totalCites=0;
@@ -471,6 +511,7 @@ function renderResults(d){
       fHTML+='<div class="fixcard"><div class="fixhd"><h4>✏️ Suggested compliant replacement</h4><button class="fixcopy" data-fix="'+fxid+'">Copy</button></div>';
       fHTML+='<div class="fixtxt" id="'+fxid+'">'+esc(f.replacement_clause)+'</div></div>';
     }
+    if(f.market_comparison)fHTML+='<div class="market-tag">📊 '+esc(f.market_comparison)+'</div>';
     fHTML+='<div class="tags"><span class="ptag">'+esc(PL[f.perspective]||f.perspective)+'</span></div></div>';
   }
   var aHTML='';
@@ -494,7 +535,14 @@ function renderResults(d){
   html+='<div class="rhead"><h2>Audit Results</h2><span class="rb '+RC[d.or]+'">'+(RL[d.or]||d.or)+'</span></div>';
   html+='<div class="sccard"><div><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">Agreement Score</div><div class="scnum">'+d.score+'<span>/100</span></div><div class="scconf">Confidence: '+d.oc+'%</div></div>';
   html+='<div style="flex:1;min-width:0"><div class="scbg"><div class="scfill" id="scfill" style="width:0%;background:'+col+'"></div></div><div class="sclbl" style="color:'+col+'">'+sLabel(d.score)+'</div><div class="scpills"><span class="rb rh">🔴 '+d.rc.h+'</span><span class="rb rm">🟡 '+d.rc.m+'</span><span class="rb rl">🟢 '+d.rc.l+'</span></div></div></div>';
+  // Trust strip — visible privacy + disclaimer line on results page.
+  html+='<div class="trustbar">🛡️ <strong>Privacy:</strong> Your document was analysed in memory and is not stored. &nbsp;·&nbsp; <strong>⚖ Disclaimer:</strong> AI-generated insights for informational use only — not legal advice.</div>';
   html+='<div class="sumcard"><h3>Overall Assessment</h3><p>'+esc(d.sum)+'</p></div>';
+  // Highlighted-agreement card (Feature 1) — shows the original text with risky clauses inline.
+  if(d.sourceText){
+    var hlBody=buildHighlightedAgreement(d.sourceText,d.findings);
+    html+='<div class="hlcard"><h3>📑 Your agreement, with risky clauses highlighted</h3><div class="lbl">Each highlighted phrase is one of the findings below. Colour = severity.</div><div class="hlbox">'+hlBody+'</div><div class="hlhint">🔴 high  ·  🟡 medium  ·  🟢 low</div></div>';
+  }
   // Verified-sources trust bar — makes the grounding visible.
   if(totalCites>0){
     html+='<div class="verbar">🛡️ <span><strong>'+totalGrounded+'/'+d.findings.length+'</strong> finding'+(d.findings.length!==1?'s':'')+' backed by <strong>'+totalCites+'</strong> verified Indian statute citation'+(totalCites!==1?'s':'')+' — every cited section is cross-checked against our legal corpus.</span></div>';
