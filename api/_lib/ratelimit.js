@@ -69,15 +69,34 @@ function check(key, limit, windowMs) {
   };
 }
 
+// Pop the most recent hit from a bucket. Used to refund a slot when the
+// downstream work failed (bad PDF, LLM error, JSON parse error) so the user
+// is not punished for failed attempts.
+function refund(key) {
+  const bucket = buckets.get(key);
+  if (bucket && bucket.hits.length > 0) {
+    bucket.hits.pop();
+  }
+}
+
 // Check both the burst (per-hour) AND the daily limit. Returns the harsher
-// result if either is exceeded.
+// result if either is exceeded. Limits raised so honest testing isn't blocked.
 function checkAuditLimits(req) {
   const ip = getClientIp(req);
-  const hourly = check("hour:" + ip, 5, 60 * 60 * 1000);   // 5 / hour
+  const hourly = check("hour:" + ip, 10, 60 * 60 * 1000);   // 10 / hour
   if (!hourly.allowed) return { ...hourly, scope: "hour" };
-  const daily = check("day:" + ip, 20, 24 * 60 * 60 * 1000); // 20 / day
+  const daily = check("day:" + ip, 50, 24 * 60 * 60 * 1000); // 50 / day
   if (!daily.allowed) return { ...daily, scope: "day" };
   return { allowed: true, remaining: Math.min(hourly.remaining, daily.remaining), scope: "ok" };
+}
+
+// Refund the audit slots consumed by checkAuditLimits. Call this when the
+// audit failed (not_agreement / LLM error / parse error) so the user keeps
+// their quota for a real attempt.
+function refundAudit(req) {
+  const ip = getClientIp(req);
+  refund("hour:" + ip);
+  refund("day:" + ip);
 }
 
 function checkRetrieveLimits(req) {
@@ -92,6 +111,8 @@ function checkRetrieveLimits(req) {
 
 module.exports = {
   getClientIp,
+  refund,
+  refundAudit,
   check,
   checkAuditLimits,
   checkRetrieveLimits

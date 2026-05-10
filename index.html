@@ -451,7 +451,15 @@ async function runAudit(){
     if(lastData)lastData.sourceText=txt;
     incrementUsage();updateCounter();setLdr(false);renderResults(lastData);
   }catch(e){
-    setLdr(false);showErr('Analysis failed: '+e.message);console.error(e);
+    setLdr(false);
+    var msg=e.message||'Unknown error';
+    // If it's a rate-limit error, give the user a useful unstick path.
+    if(/limit reached/i.test(msg)||/try again in/i.test(msg)){
+      showErr(msg+' Tip: this is per-network. Try mobile data, a different Wi-Fi, or wait it out. Failed audits no longer count against the quota.');
+    } else {
+      showErr('Analysis failed: '+msg+'. Failed attempts now refund your free quota — please retry.');
+    }
+    console.error(e);
   }
 }
 

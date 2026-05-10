@@ -143,18 +143,20 @@ module.exports = async function handler(req, res) {
 
     if (!response.ok) {
       console.error('Groq HTTP error:', response.status, await response.text());
-      return res.status(502).json({ error: { message: 'Generation service unavailable. Please retry.' } });
+      rl.refundAudit(req);
+      return res.status(502).json({ error: { message: 'Generation service unavailable. Please retry — your free quota was not used.' } });
     }
     const data = await response.json();
     const content = data && data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : null;
-    if (!content) return res.status(502).json({ error: { message: 'No response from generation service.' } });
+    if (!content) { rl.refundAudit(req); return res.status(502).json({ error: { message: 'No response from generation service. Your free quota was not used.' } }); }
 
     let parsed;
     try { parsed = JSON.parse(content.replace(/```json|```/g, '').trim()); }
-    catch (e) { return res.status(502).json({ error: { message: 'Generation returned malformed output.' } }); }
+    catch (e) { rl.refundAudit(req); return res.status(502).json({ error: { message: 'Generation returned malformed output. Your free quota was not used.' } }); }
 
     if (!parsed || !parsed.agreement || typeof parsed.agreement !== 'string') {
-      return res.status(502).json({ error: { message: 'Generation returned no agreement text.' } });
+      rl.refundAudit(req);
+      return res.status(502).json({ error: { message: 'Generation returned no agreement text. Your free quota was not used.' } });
     }
 
     // Safety net: scan the generated text for void-clause patterns.
@@ -175,6 +177,7 @@ module.exports = async function handler(req, res) {
     });
   } catch (err) {
     console.error('Generate handler error:', err);
-    return res.status(500).json({ error: { message: 'Generation failed unexpectedly.' } });
+    rl.refundAudit(req);
+    return res.status(500).json({ error: { message: 'Generation failed unexpectedly. Your free quota was not used.' } });
   }
 };

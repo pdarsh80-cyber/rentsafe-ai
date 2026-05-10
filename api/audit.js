@@ -167,11 +167,13 @@ module.exports = async function handler(req, res) {
       const result = await pdfParse(buffer);
       agreementText = result.text;
       if (!agreementText || agreementText.trim().length < 50) {
-        return res.status(400).json({ error: { message: 'Could not extract text from PDF. Try pasting the text instead.' } });
+        rl.refundAudit(req);
+        return res.status(400).json({ error: { message: 'Could not extract text from PDF. Try pasting the text instead. Your free quota was not used.' } });
       }
     } catch (e) {
       console.error('PDF error:', e);
-      return res.status(400).json({ error: { message: 'Failed to read PDF. Make sure it is not scanned or image-based.' } });
+      rl.refundAudit(req);
+      return res.status(400).json({ error: { message: 'Failed to read PDF. Make sure it is not scanned or image-based. Your free quota was not used.' } });
     }
   }
 
@@ -205,22 +207,29 @@ module.exports = async function handler(req, res) {
     if (!response.ok) {
       const errBody = await response.text();
       console.error('Groq HTTP error:', response.status, errBody);
-      return res.status(502).json({ error: { message: 'Audit service is busy. Please try again in a moment.' } });
+      rl.refundAudit(req); // Don't punish the user for our upstream failure.
+      return res.status(502).json({ error: { message: 'Audit service is busy. Please try again in a moment. Your free quota was not used.' } });
     }
     const data = await response.json();
     const content = data && data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : null;
     if (!content) {
       console.error('Empty Groq response:', JSON.stringify(data).slice(0, 400));
-      return res.status(502).json({ error: { message: 'No response from audit service.' } });
+      rl.refundAudit(req);
+      return res.status(502).json({ error: { message: 'No response from audit service. Your free quota was not used.' } });
     }
     const raw = content.replace(/```json|```/g, '').trim();
     let parsed;
     try { parsed = JSON.parse(raw); }
     catch (e) {
       console.error('JSON parse failed:', raw.slice(0, 500));
-      return res.status(502).json({ error: { message: 'Audit service returned malformed output. Please retry.' } });
+      rl.refundAudit(req);
+      return res.status(502).json({ error: { message: 'Audit service returned malformed output. Please retry — your free quota was not used.' } });
     }
-    if (parsed && parsed.error === 'not_agreement') return res.status(200).json(parsed);
+    if (parsed && parsed.error === 'not_agreement') {
+      // The LLM detected this is not a rental agreement. Don't burn an audit slot.
+      rl.refundAudit(req);
+      return res.status(200).json(parsed);
+    }
     parsed = verifyAndEnrich(parsed);
     parsed._meta = {
       corpus_version: '0.2.0',
@@ -231,6 +240,8 @@ module.exports = async function handler(req, res) {
     return res.status(200).json(parsed);
   } catch (err) {
     console.error('Handler error:', err);
-    return res.status(500).json({ error: { message: 'Audit failed unexpectedly. Please retry.' } });
+    rl.refundAudit(req);
+    rl.refundAudit(req);
+    return res.status(500).json({ error: { message: 'Audit failed unexpectedly. Please retry — your free quota was not used.' } });
   }
 };
