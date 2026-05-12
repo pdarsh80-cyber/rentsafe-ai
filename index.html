@@ -170,6 +170,21 @@ footer{background:#0f1a2e;color:#94a3b8;padding:28px 16px;text-align:center}
 footer p{font-size:11.5px;line-height:1.7;max-width:520px;margin:0 auto 5px}
 .disc{border-top:1px solid rgba(255,255,255,.1);padding-top:13px;margin-top:13px}
 @media(min-width:580px){.shbtns{flex-direction:row;flex-wrap:wrap}.sb{flex:1;min-width:110px;width:auto}.overlay{align-items:center;padding:20px}.mbox{border-radius:16px;max-width:420px}.mhandle{display:none}.sccard{flex-direction:row;align-items:center}.pw-plans{flex-direction:row}.pw-plan{flex:1}}
+/* ── SIMPLE EXPLANATION + LANDLORD QUESTIONS + RISK BREAKDOWN ── */
+.simple-exp{background:#f0fdf4;border-left:3px solid #22c55e;border-radius:6px;padding:9px 11px;margin-top:8px;font-size:13px;color:#166534;line-height:1.6}
+.simple-exp::before{content:"📘 Plain English: ";font-weight:700;color:#0f5132}
+.lqcard{background:#fff;border-radius:12px;padding:16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05);border-left:4px solid #f59e0b}
+.lqcard h3{font-size:14px;font-weight:700;color:#0f1a2e;margin-bottom:5px}
+.lqcard .lbl{font-size:11.5px;color:#6b7280;margin-bottom:10px}
+.lqitem{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #f3f4f6;font-size:13.5px;color:#374151;line-height:1.55}
+.lqitem:last-child{border-bottom:none}
+.lqnum{flex-shrink:0;width:22px;height:22px;background:#fef3c7;color:#92400e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.rbcard{background:#fff;border-radius:12px;padding:15px;margin-bottom:13px;box-shadow:0 2px 8px rgba(0,0,0,.05);border-left:4px solid #6366f1}
+.rbcard h3{font-size:13px;font-weight:700;color:#0f1a2e;margin-bottom:9px;display:flex;align-items:center;gap:6px}
+.rbitem{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #f3f4f6;font-size:12.5px;color:#374151}
+.rbitem:last-child{border-bottom:none;font-weight:700;color:#0f1a2e;padding-top:9px;margin-top:3px;border-top:2px solid #e5e7eb}
+.rbcontrib{font-weight:600;color:#ef4444}
+.rbcontrib.m{color:#f59e0b}.rbcontrib.l{color:#22c55e}
 /* ── HIGHLIGHTED AGREEMENT + TRUST STRIP + MARKET TAG ── */
 .trustbar{background:linear-gradient(135deg,#ecfdf5,#f0fdf4);border:1px solid #bbf7d0;border-radius:10px;padding:11px 13px;margin-bottom:13px;font-size:12.5px;color:#166534;line-height:1.55}
 .trustbar strong{color:#0f5132}
@@ -419,6 +434,11 @@ document.getElementById('auditbtn').addEventListener('click',function(){
   var txt=document.getElementById('txt').value.trim();
   if(curTab==='paste'&&!txt){showErr('Please paste your agreement text first.');return;}
   if(curTab==='upload'&&!pdfText){showErr('Please upload a PDF first.');return;}
+  // Client-side pre-validation (Feature 6) — saves Groq quota on obvious non-rental files.
+  var checkText=(curTab==='paste'?txt:pdfText).toLowerCase();
+  var kw=['tenant','landlord','lease','rent','deposit','agreement','tenancy','premises'];
+  var hits=kw.filter(function(k){return checkText.indexOf(k)>=0;}).length;
+  if(hits<2){showErr('⚠ This does not appear to be a rental agreement (no rental keywords found). Please upload an actual rental agreement. Your free quota was not used.');return;}
   if(!canAudit()){document.getElementById('paywallModal').classList.add('on');return;}
   modal.classList.add('on');
 });
@@ -447,7 +467,7 @@ async function runAudit(){
     var score=calcScore(result.findings);
     lastData={state:selState,ts:new Date().toISOString(),score:score,or:result.overall_risk,oc:result.overall_confidence||80,
       rc:{h:result.findings.filter(function(f){return f.risk==='high';}).length,m:result.findings.filter(function(f){return f.risk==='medium';}).length,l:result.findings.filter(function(f){return f.risk==='low';}).length},
-      findings:result.findings,actions:result.actions||[],miss:result.missing_clauses||[],pos:result.positive_clauses||[],sum:result.summary};
+      findings:result.findings,actions:result.actions||[],miss:result.missing_clauses||[],pos:result.positive_clauses||[],sum:result.summary,landlord_questions:result.landlord_questions||[]};
     if(lastData)lastData.sourceText=txt;
     incrementUsage();updateCounter();setLdr(false);renderResults(lastData);
   }catch(e){
@@ -502,6 +522,7 @@ function renderResults(d){
     fHTML+='<p class="fexp">'+esc(f.explanation)+'</p>';
     if(f.clause_ref)fHTML+='<div class="cref">📄 '+esc(f.clause_ref)+'</div>';
     if(f.impact)fHTML+='<div class="imp">💡 '+esc(f.impact)+'</div>';
+    if(f.simple_explanation)fHTML+='<div class="simple-exp">'+esc(f.simple_explanation)+'</div>';
     // Verified statute citations (new) — expandable, shows actual law text.
     if(hasGrounded){
       for(var ci=0;ci<f.citations.length;ci++){
@@ -555,7 +576,30 @@ function renderResults(d){
   if(totalCites>0){
     html+='<div class="verbar">🛡️ <span><strong>'+totalGrounded+'/'+d.findings.length+'</strong> finding'+(d.findings.length!==1?'s':'')+' backed by <strong>'+totalCites+'</strong> verified Indian statute citation'+(totalCites!==1?'s':'')+' — every cited section is cross-checked against our legal corpus.</span></div>';
   }
+  // Score breakdown (Feature 4) — shows how each finding pulled down the score.
+  var contribs=d.findings.filter(function(f){return Number.isFinite(f.risk_contribution)&&f.risk_contribution>0;});
+  if(contribs.length){
+    var rb='<div class="rbcard"><h3>📊 Why this score</h3>';
+    var total=0;
+    for(var ri=0;ri<contribs.length;ri++){
+      var cf=contribs[ri];
+      var cls=cf.risk==='high'?'':cf.risk==='medium'?'m':'l';
+      rb+='<div class="rbitem"><span>'+esc(cf.title)+'</span><span class="rbcontrib '+cls+'">−'+cf.risk_contribution+'</span></div>';
+      total+=cf.risk_contribution;
+    }
+    rb+='<div class="rbitem"><span>Total deductions from 100</span><span>−'+total+'</span></div></div>';
+    html+=rb;
+  }
   html+='<div class="ftitle">⚖️ Detailed Findings</div>'+fHTML+aHTML+mHTML+pHTML;
+  // Landlord-questions card (Feature 5) — practical negotiation prompts.
+  if(Array.isArray(d.landlord_questions)&&d.landlord_questions.length){
+    var lq='<div class="lqcard"><h3>🤝 What to ask your landlord</h3><div class="lbl">Polite, non-aggressive prompts to open negotiation on the flagged clauses.</div>';
+    for(var qi=0;qi<d.landlord_questions.length;qi++){
+      lq+='<div class="lqitem"><div class="lqnum">'+(qi+1)+'</div><div>'+esc(d.landlord_questions[qi])+'</div></div>';
+    }
+    lq+='</div>';
+    html+=lq;
+  }
   // Share card (copy summary, share to friends, send polite fix request to landlord)
   html+='<div class="shcard"><h3>📤 Share or take action</h3>';
   html+='<div class="shprev">"'+esc(shareText)+'"</div>';
