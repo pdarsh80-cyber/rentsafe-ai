@@ -525,6 +525,51 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 var RL={high:'🔴 High Risk',medium:'🟡 Medium Risk',low:'🟢 Low Risk'};
 var RC={high:'rh',medium:'rm',low:'rl'};
 var PL={tenant:'👤 Tenant',landlord:'🏠 Landlord',both:'👥 Both'};
+var LANGS=[{code:'en',native:'English'},{code:'gu',native:'ગુજરાતી'},{code:'hi',native:'हिंदी'},{code:'mr',native:'मराठी'},{code:'kn',native:'ಕನ್ನಡ'},{code:'ml',native:'മലയാളം'},{code:'ta',native:'தமிழ்'},{code:'te',native:'తెలుగు'},{code:'pa',native:'ਪੰਜਾਬੀ'},{code:'bn',native:'বাংলা'}];
+var currentExplanationLang='en',trCache={};
+function parseGoogleTranslatePayload(raw){
+  var t=String(raw||'').trim().replace(/^\)\]\}'\s*/, '');
+  return JSON.parse(t);
+}
+async function trText(text,target){
+  var t=String(text||'').trim();
+  if(!t||target==='en')return t;
+  var key=target+'::'+t;if(trCache[key])return trCache[key];
+  try{
+    var r=await fetch('https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl='+encodeURIComponent(target)+'&dt=t&q='+encodeURIComponent(t));
+    var raw=await r.text();
+    var j=parseGoogleTranslatePayload(raw);
+    trCache[key]=(j&&j[0]||[]).map(function(x){return x[0]||'';}).join('')||t;
+    return trCache[key];
+  }catch(e1){
+    try{
+      var mm=await fetch('https://api.mymemory.translated.net/get?q='+encodeURIComponent(t)+'&langpair=en|'+encodeURIComponent(target));
+      var mj=await mm.json();
+      var out=(mj&&mj.responseData&&mj.responseData.translatedText)||'';
+      trCache[key]=out||t;
+      return trCache[key];
+    }catch(e2){return t;}
+  }
+}
+async function trData(d,target){
+  if(target==='en')return d;
+  var x=JSON.parse(JSON.stringify(d));
+  // IMPORTANT: translate only explanatory text. Keep legal references in English.
+  x.sum=await trText(x.sum,target);
+  x.actions=await Promise.all((x.actions||[]).map(function(v){return trText(v,target);}));
+  // Keep missing/positive clause labels un-translated to avoid altering legal wording.
+  x.landlord_questions=await Promise.all((x.landlord_questions||[]).map(function(v){return trText(v,target);}));
+  for(var i=0;i<(x.findings||[]).length;i++){
+    var f=x.findings[i];
+    f.explanation=await trText(f.explanation,target);
+    f.impact=await trText(f.impact,target);
+    f.simple_explanation=await trText(f.simple_explanation,target);
+    f.market_comparison=await trText(f.market_comparison,target);
+    // DO NOT translate: f.title, f.clause_ref, citation labels, and statute text.
+    if(Array.isArray(f.citations))for(var ci=0;ci<f.citations.length;ci++)f.citations[ci].plain_summary=await trText(f.citations[ci].plain_summary,target);
+  }
+  return x;
+}
 
 async function runAudit(){
   setLdr(true);res.classList.remove('on');
@@ -583,7 +628,9 @@ function buildHighlightedAgreement(text,findings){
   }
   return safe.replace(/\n/g,'<br>');
 }
-function renderResults(d){
+async function renderResults(d){
+  var baseData=d;
+  d=await trData(d,currentExplanationLang);
   var col=sColor(d.score),i,f,c,html='';
   var fHTML='',totalGrounded=0,totalCites=0;
   for(i=0;i<d.findings.length;i++){
@@ -638,6 +685,7 @@ function renderResults(d){
   html+='<div class="rhead"><h2>Audit Results</h2><span class="rb '+RC[d.or]+'">'+(RL[d.or]||d.or)+'</span></div>';
   html+='<div class="sccard"><div><div style="font-size:10px;color:#94a3b8;margin-bottom:3px">Agreement Score</div><div class="scnum">'+d.score+'<span>/100</span></div><div class="scconf">Confidence: '+d.oc+'%</div></div>';
   html+='<div style="flex:1;min-width:0"><div class="scbg"><div class="scfill" id="scfill" style="width:0%;background:'+col+'"></div></div><div class="sclbl" style="color:'+col+'">'+sLabel(d.score)+'</div><div class="scpills"><span class="rb rh">🔴 '+d.rc.h+'</span><span class="rb rm">🟡 '+d.rc.m+'</span><span class="rb rl">🟢 '+d.rc.l+'</span></div></div></div>';
+  html+='<div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px;margin-bottom:10px"><div style="font-size:12px;font-weight:700;color:#374151;margin-bottom:6px">View Explanation In:</div><select id="langSel" style="margin-bottom:0">'+LANGS.map(function(l){return '<option value="'+l.code+'" '+(l.code===currentExplanationLang?'selected':'')+'>'+l.native+'</option>';}).join('')+'</select></div>';
   // Trust strip — visible privacy + disclaimer line on results page.
   html+='<div class="trustbar">🛡️ <strong>Privacy:</strong> Your document was analysed in memory and is not stored. &nbsp;·&nbsp; <strong>⚖ Disclaimer:</strong> AI-generated insights for informational use only — not legal advice.</div>';
   html+='<div class="sumcard"><h3>Overall Assessment</h3><p>'+esc(d.sum)+'</p></div>';
@@ -760,6 +808,8 @@ function renderResults(d){
     window.open('https://wa.me/?text='+encodeURIComponent(landlordMsg),'_blank');
   });
   var sbdl=document.getElementById('sbdl');
+  var langSel=document.getElementById('langSel');
+  if(langSel)langSel.addEventListener('change',async function(){currentExplanationLang=this.value;await renderResults(baseData);});
   if(sbdl)sbdl.addEventListener('click',function(){
     try{generateReport(d);}
     catch(e){console.error('PDF gen failed:',e);alert('PDF generation failed: '+e.message);}
