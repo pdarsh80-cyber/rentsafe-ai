@@ -1,4 +1,68 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js">
+// ────────────────────────────────────────────────────────────────────────────
+// Multilingual mode: batched translation via /api/translate.
+// Walks the English source (lastDataEn), collects translatable strings,
+// sends one batched request, applies translations, re-renders.
+// Legal citations / statute names / replacement clauses stay in English.
+// ────────────────────────────────────────────────────────────────────────────
+async function translateResults(lang){
+  if(!lastDataEn)return;
+  currentLang=lang;
+  // English passthrough = restore the original copy and re-render.
+  if(lang==='en'){
+    lastData=JSON.parse(JSON.stringify(lastDataEn));
+    renderResults(lastData);
+    return;
+  }
+  // Collect strings + reference paths so we can patch them back into the data tree.
+  var toTranslate=[],refs=[];
+  function add(p,s){if(s&&typeof s==='string'&&s.trim().length){toTranslate.push(s);refs.push(p);}}
+  add('sum',lastDataEn.sum);
+  for(var i=0;i<lastDataEn.findings.length;i++){
+    var f=lastDataEn.findings[i];
+    add('findings.'+i+'.title',f.title);
+    add('findings.'+i+'.explanation',f.explanation);
+    add('findings.'+i+'.impact',f.impact);
+    add('findings.'+i+'.simple_explanation',f.simple_explanation);
+    add('findings.'+i+'.market_comparison',f.market_comparison);
+  }
+  for(var ai=0;ai<(lastDataEn.actions||[]).length;ai++)add('actions.'+ai,lastDataEn.actions[ai]);
+  if(Array.isArray(lastDataEn.landlord_questions))
+    for(var qi=0;qi<lastDataEn.landlord_questions.length;qi++)add('landlord_questions.'+qi,lastDataEn.landlord_questions[qi]);
+  for(var mi=0;mi<(lastDataEn.miss||[]).length;mi++)add('miss.'+mi,lastDataEn.miss[mi]);
+  for(var pi=0;pi<(lastDataEn.pos||[]).length;pi++)add('pos.'+pi,lastDataEn.pos[pi]);
+
+  if(!toTranslate.length){renderResults(lastData);return;}
+
+  var bar=document.querySelector('.langbar');
+  if(bar)bar.classList.add('translating');
+  try{
+    var r=await fetch('/api/translate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({strings:toTranslate,language:lang})});
+    var d=await r.json();
+    if(d.error)throw new Error(d.error.message||'translation failed');
+    var t=d.translations||[];
+    var newData=JSON.parse(JSON.stringify(lastDataEn));
+    for(var k=0;k<refs.length;k++){
+      var parts=refs[k].split('.');
+      var val=t[k]||toTranslate[k];
+      if(parts[0]==='sum')newData.sum=val;
+      else if(parts[0]==='findings')newData.findings[parseInt(parts[1])][parts[2]]=val;
+      else if(parts[0]==='actions')newData.actions[parseInt(parts[1])]=val;
+      else if(parts[0]==='landlord_questions')newData.landlord_questions[parseInt(parts[1])]=val;
+      else if(parts[0]==='miss')newData.miss[parseInt(parts[1])]=val;
+      else if(parts[0]==='pos')newData.pos[parseInt(parts[1])]=val;
+    }
+    lastData=newData;
+    renderResults(lastData);
+  }catch(e){
+    if(bar)bar.classList.remove('translating');
+    showErr('Translation failed: '+e.message+'. Showing English.');
+    currentLang='en';
+    lastData=JSON.parse(JSON.stringify(lastDataEn));
+    renderResults(lastData);
+  }
+}
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.0.4/tesseract.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
@@ -170,6 +234,14 @@ footer{background:#0f1a2e;color:#94a3b8;padding:28px 16px;text-align:center}
 footer p{font-size:11.5px;line-height:1.7;max-width:520px;margin:0 auto 5px}
 .disc{border-top:1px solid rgba(255,255,255,.1);padding-top:13px;margin-top:13px}
 @media(min-width:580px){.shbtns{flex-direction:row;flex-wrap:wrap}.sb{flex:1;min-width:110px;width:auto}.overlay{align-items:center;padding:20px}.mbox{border-radius:16px;max-width:420px}.mhandle{display:none}.sccard{flex-direction:row;align-items:center}.pw-plans{flex-direction:row}.pw-plan{flex:1}}
+/* ── LANGUAGE BAR (multilingual mode) ── */
+.langbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:#fff;border:1px solid #e5e7eb;border-radius:11px;padding:10px 12px;margin-bottom:13px;position:relative}
+.langbar.translating::after{content:"translating…";position:absolute;right:13px;top:50%;transform:translateY(-50%);font-size:11px;color:#6b7280;font-style:italic;background:#fff;padding-left:8px}
+.langlbl{font-size:11.5px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-right:4px}
+.langbtn{background:#f3f4f6;border:1px solid #e5e7eb;color:#1f2937;padding:6px 11px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
+.langbtn:hover{background:#fef3c7;border-color:#fde68a}
+.langbtn.on{background:#0f1a2e;color:#fff;border-color:#0f1a2e}
+@media(max-width:580px){.langbar{padding:9px 11px}.langbtn{padding:7px 10px;min-height:36px;font-size:12px}}
 /* ── SIMPLE EXPLANATION + LANDLORD QUESTIONS + RISK BREAKDOWN ── */
 .simple-exp{background:#f0fdf4;border-left:3px solid #22c55e;border-radius:6px;padding:9px 11px;margin-top:8px;font-size:13px;color:#166534;line-height:1.6}
 .simple-exp::before{content:"📘 Plain English: ";font-weight:700;color:#0f5132}
@@ -325,7 +397,7 @@ footer p{font-size:11.5px;line-height:1.7;max-width:520px;margin:0 auto 5px}
 </footer>
 
 <script>
-var curTab='paste',pdfText=null,selState='',lastData=null;
+var curTab='paste',pdfText=null,selState='',lastData=null,lastDataEn=null,currentLang='en';
 var FREE_LIMIT=1;
 function getUsage(){try{return JSON.parse(localStorage.getItem('rentsafe_usage')||'{"count":0,"plan":"free"}')}catch(e){return{count:0,plan:'free'}}}
 function setUsage(u){localStorage.setItem('rentsafe_usage',JSON.stringify(u))}
@@ -469,6 +541,8 @@ async function runAudit(){
       rc:{h:result.findings.filter(function(f){return f.risk==='high';}).length,m:result.findings.filter(function(f){return f.risk==='medium';}).length,l:result.findings.filter(function(f){return f.risk==='low';}).length},
       findings:result.findings,actions:result.actions||[],miss:result.missing_clauses||[],pos:result.positive_clauses||[],sum:result.summary,landlord_questions:result.landlord_questions||[]};
     if(lastData)lastData.sourceText=txt;
+    lastDataEn=JSON.parse(JSON.stringify(lastData));
+    currentLang='en';
     incrementUsage();updateCounter();setLdr(false);renderResults(lastData);
   }catch(e){
     setLdr(false);
@@ -572,6 +646,14 @@ function renderResults(d){
     var hlBody=buildHighlightedAgreement(d.sourceText,d.findings);
     html+='<div class="hlcard"><h3>📑 Your agreement, with risky clauses highlighted</h3><div class="lbl">Each highlighted phrase is one of the findings below. Colour = severity.</div><div class="hlbox">'+hlBody+'</div><div class="hlhint">🔴 high  ·  🟡 medium  ·  🟢 low</div></div>';
   }
+  // Language selector (multilingual mode) — translates explanations on demand.
+  var langs=[['en','English'],['hi','हिंदी'],['gu','ગુજરાતી'],['mr','मराठी'],['kn','ಕನ್ನಡ'],['ml','മലയാളം'],['ta','தமிழ்'],['te','తెలుగు'],['pa','ਪੰਜਾਬੀ'],['bn','বাংলা']];
+  var lb='<div class="langbar"><span class="langlbl">🌐 View in:</span>';
+  for(var li=0;li<langs.length;li++){
+    lb+='<button class="langbtn '+(currentLang===langs[li][0]?'on':'')+'" data-lang="'+langs[li][0]+'">'+langs[li][1]+'</button>';
+  }
+  lb+='</div>';
+  html+=lb;
   // Verified-sources trust bar — makes the grounding visible.
   if(totalCites>0){
     html+='<div class="verbar">🛡️ <span><strong>'+totalGrounded+'/'+d.findings.length+'</strong> finding'+(d.findings.length!==1?'s':'')+' backed by <strong>'+totalCites+'</strong> verified Indian statute citation'+(totalCites!==1?'s':'')+' — every cited section is cross-checked against our legal corpus.</span></div>';
@@ -631,6 +713,13 @@ function renderResults(d){
     pdfText=null;fsel.style.display='none';dz.style.display='block';fi.value='';
     switchTab('paste');selState='';stsel.value='';mcbtn.disabled=true;lastData=null;
     document.getElementById('maincard').scrollIntoView({behavior:'smooth'});
+  });
+  // Language selector handlers — translate via /api/translate, then re-render.
+  document.querySelectorAll('.langbtn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var lang=this.getAttribute('data-lang');
+      translateResults(lang);
+    });
   });
   // Citation expand/collapse — lets users read the actual statute text.
   document.querySelectorAll('.cite-tog').forEach(function(btn){
